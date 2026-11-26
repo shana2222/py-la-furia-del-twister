@@ -605,13 +605,12 @@ numero = int(input("Número: "))</code></div>
       <div class="split-pane">
         <div class="step-label"><span class="num">2</span> Tu tarea</div>
         <div class="consigna">
-          <p class="goal">🎯 Muestra los 3 refugios numerados con un bucle <strong>for</strong>.</p>
+          <p class="goal">🎯 Muestra los 3 refugios numerados.</p>
           <ol>
-            <li>Crea una lista llamada <code>refugios</code> con los tres refugios, en este orden: Subterráneo, en las Montañas, en el Bosque. Escribe <code>refugios = []</code> y, entre los corchetes, toca <button class="ins" data-snip="m1_lista" data-ta="code1_step1">📋 Insertar nombres</button></li>
-            <li>Crea la variable <code>contador</code> e inicialízala en <code>1</code>. Va <strong>antes</strong> del bucle.</li>
-            <li>Con un bucle <code>for</code>, recorre la lista <code>refugios</code>. Llama <code>refugio</code> a la variable del bucle: en cada vuelta guarda un refugio distinto.</li>
-            <li>Dentro del bucle, imprime el contador, un punto y el refugio. Escribe <code>print()</code> y, entre los paréntesis, toca <button class="ins" data-snip="m1_print" data-ta="code1_step1">📋 Insertar texto</button></li>
-            <li>Dentro del bucle, después del print, aumenta el contador en 1: <code>contador += 1</code>.</li>
+            <li>Crea la lista <code>refugios</code> con los tres refugios, en este orden. <button class="ins" data-snip="m1_lista" data-ta="code1_step1">📋 Insertar nombres</button></li>
+            <li>Crea la variable <code>contador</code> e inicialízala en 1.</li>
+            <li>Con un bucle <strong>for</strong>, recorre la lista <code>refugios</code> y muestra cada refugio con su número. <button class="ins" data-snip="m1_print" data-ta="code1_step1">📋 Insertar texto</button></li>
+            <li>Aumenta el contador en cada vuelta.</li>
           </ol>
         </div>
         <div class="expected-box">
@@ -675,12 +674,11 @@ numero = int(input("Número: "))</code></div>
       <div class="split-pane">
         <div class="step-label"><span class="num">2</span> Tu tarea</div>
         <div class="consigna">
-          <p class="goal">🎯 Pide un número del 1 al 3 y guarda el refugio elegido.</p>
+          <p class="goal">🎯 Pide el número de refugio y guarda el refugio elegido.</p>
           <ol>
-            <li>Crea la variable <code>eleccion</code> y guarda en ella el número que escribe la persona. Usa <code>input()</code> dentro de <code>int()</code> para convertirlo en número entero. Para la pregunta del <code>input()</code>, toca <button class="ins" data-snip="m1_input" data-ta="code1_step2">📋 Insertar texto</button></li>
-            <li>Calcula la posición en la lista: réstale 1 a <code>eleccion</code>. Si eligen 1, la posición es 0 (mira el diagrama).</li>
-            <li>Crea la variable <code>refugio_usuario</code> y guarda en ella el elemento de la lista <code>refugios</code> que está en esa posición: <code>refugios[...]</code>.</li>
-            <li>Imprime el mensaje de confirmación y, después de una coma, <code>refugio_usuario</code>. Para el mensaje, toca <button class="ins" data-snip="m1_print2" data-ta="code1_step2">📋 Insertar texto</button></li>
+            <li>Pide al usuario el número de refugio y guárdalo como número entero en <code>eleccion</code>. <button class="ins" data-snip="m1_input" data-ta="code1_step2">📋 Insertar texto</button></li>
+            <li>Guarda en <code>refugio_usuario</code> el refugio que corresponde a ese número.</li>
+            <li>Muestra el refugio elegido. <button class="ins" data-snip="m1_print2" data-ta="code1_step2">📋 Insertar texto</button></li>
           </ol>
         </div>
         <div class="expected-box">
@@ -767,13 +765,12 @@ len(mi_lista) &lt; 5  # True/False</code></div>
       <div class="split-pane">
         <div class="step-label"><span class="num">2</span> Tu tarea</div>
         <div class="consigna">
-          <p class="goal">🎯 Muestra los 9 suministros numerados, igual que hiciste con los refugios.</p>
+          <p class="goal">🎯 Muestra los 9 suministros numerados.</p>
           <ol>
-            <li>Crea una lista llamada <code>suministros_clave</code> con los 9 suministros, en minúscula y en este orden: manta, fuego, comida, botiquin, kit furioso, linterna, radio, filtro, cobija. Escribe <code>suministros_clave = []</code> y, entre los corchetes, toca <button class="ins" data-snip="m2_lista" data-ta="code2_step1">📋 Insertar nombres</button></li>
-            <li>Crea la variable <code>contador</code> e inicialízala en <code>1</code>, antes del bucle.</li>
-            <li>Con un bucle <code>for</code>, recorre la lista <code>suministros_clave</code>. Llama <code>suministro</code> a la variable del bucle.</li>
-            <li>Dentro del bucle, imprime el contador, un punto y el suministro. Escribe <code>print()</code> y, entre los paréntesis, toca <button class="ins" data-snip="m2_print" data-ta="code2_step1">📋 Insertar texto</button></li>
-            <li>Dentro del bucle, aumenta el contador en 1: <code>contador += 1</code>.</li>
+            <li>Crea la lista <code>suministros_clave</code> con los 9 suministros, en este orden. <button class="ins" data-snip="m2_lista" data-ta="code2_step1">📋 Insertar nombres</button></li>
+            <li>Crea la variable <code>contador</code> e inicialízala en 1.</li>
+            <li>Con un bucle <strong>for</strong>, recorre la lista y muestra cada suministro con su número. <button class="ins" data-snip="m2_print" data-ta="code2_step1">📋 Insertar texto</button></li>
+            <li>Aumenta el contador en cada vuelta.</li>
           </ol>
         </div>
         <div class="expected-box">
@@ -852,19 +849,14 @@ len(mi_lista) &lt; 5  # True/False</code></div>
       <div class="split-pane">
         <div class="step-label"><span class="num">2</span> Tu tarea</div>
         <div class="consigna">
-          <p class="goal">🎯 Pide suministros hasta llenar la valija (5) o hasta que escriban «salir».</p>
+          <p class="goal">🎯 Carga la valija hasta tener 5 suministros o hasta que el usuario escriba «salir».</p>
           <ol>
-            <li>Crea la lista <code>inventario_usuario</code> e inicialízala vacía: <code>[]</code>. Ahí se guardan los suministros elegidos.</li>
-            <li>Crea la variable <code>eleccion</code> e inicialízala con un texto vacío: <code>""</code>. Va a guardar lo que escribe la persona en cada vuelta.</li>
-            <li>Escribe un bucle <code>while</code> que se repita mientras se cumplan <strong>las dos</strong> condiciones a la vez (únelas con <code>and</code>):
-              <ul>
-                <li>la lista <code>inventario_usuario</code> tiene menos de 5 elementos (usa <code>len()</code>);</li>
-                <li><code>eleccion</code> es distinta de <code>"salir"</code> (usa <code>!=</code>).</li>
-              </ul>
-            </li>
-            <li>Dentro del while, pide un suministro con <code>input()</code> y guárdalo en <code>eleccion</code>. Para la pregunta del <code>input()</code>, toca <button class="ins" data-snip="m2_input" data-ta="code2_step2">📋 Insertar texto</button></li>
-            <li>Dentro del while, con un <code>if</code>: si <code>eleccion</code> no es <code>"salir"</code>, agrégala a la lista con <code>inventario_usuario.append(eleccion)</code>.</li>
-            <li>Fuera del while (sin sangría), imprime el mensaje y, después de una coma, la lista <code>inventario_usuario</code>. Para el mensaje, toca <button class="ins" data-snip="m2_print2" data-ta="code2_step2">📋 Insertar texto</button></li>
+            <li>Crea la lista vacía <code>inventario_usuario</code>.</li>
+            <li>Crea la variable <code>eleccion</code> e inicialízala con un texto vacío.</li>
+            <li>Con un bucle <strong>while</strong>, repite mientras el inventario tenga menos de 5 suministros y <code>eleccion</code> no sea "salir".</li>
+            <li>En cada vuelta, pide un suministro y guárdalo en <code>eleccion</code>. <button class="ins" data-snip="m2_input" data-ta="code2_step2">📋 Insertar texto</button></li>
+            <li>Si no es "salir", agrégalo a <code>inventario_usuario</code>.</li>
+            <li>Al terminar, muestra el inventario. <button class="ins" data-snip="m2_print2" data-ta="code2_step2">📋 Insertar texto</button></li>
           </ol>
         </div>
         <div class="expected-box">
@@ -953,11 +945,10 @@ print(es_seguro)</code></div>
         <div class="consigna">
           <p class="goal">🎯 Sortea un suministro y verifica si está en tu valija.</p>
           <ol>
-            <li>En la primera línea, importa el módulo de azar: <code>import random</code>.</li>
-            <li>Crea la variable <code>suministro_requerido</code> y guarda en ella un elemento al azar de la lista <code>suministros_clave</code>. Usa <code>random.choice()</code>.</li>
-            <li>Crea la variable <code>es_seguro</code> y guarda en ella si <code>suministro_requerido</code> está en la lista <code>inventario_usuario</code>. Usa el operador <code>in</code>: el resultado es <code>True</code> o <code>False</code>.</li>
-            <li>Imprime el mensaje y, después de una coma, <code>suministro_requerido</code>. Para el mensaje, toca <button class="ins" data-snip="m3_print1" data-ta="code3">📋 Insertar texto</button></li>
-            <li>Imprime el mensaje y, después de una coma, <code>es_seguro</code>. Para el mensaje, toca <button class="ins" data-snip="m3_print2" data-ta="code3">📋 Insertar texto</button></li>
+            <li>Importa el módulo <code>random</code>.</li>
+            <li>Elige al azar un suministro de <code>suministros_clave</code> y guárdalo en <code>suministro_requerido</code>.</li>
+            <li>Guarda en <code>es_seguro</code> si ese suministro está en <code>inventario_usuario</code>.</li>
+            <li>Muestra el suministro requerido <button class="ins" data-snip="m3_print1" data-ta="code3">📋 Insertar texto</button> y el valor de <code>es_seguro</code>. <button class="ins" data-snip="m3_print2" data-ta="code3">📋 Insertar texto</button></li>
           </ol>
         </div>
         <div class="expected-box">
@@ -1050,13 +1041,10 @@ print(f"Hola, {nombre}")</code></div>
       <div class="split-pane">
         <div class="step-label"><span class="num">2</span> Tu tarea</div>
         <div class="consigna">
-          <p class="goal">🎯 Con <strong>if / else</strong>, muestra el mensaje de victoria o el de derrota.</p>
+          <p class="goal">🎯 Muestra el final de la historia según <code>es_seguro</code>.</p>
           <ol>
-            <li>Escribe la condición <code>if es_seguro:</code>. No hace falta poner <code>== True</code>.</li>
-            <li>Dentro del if, imprime el mensaje de victoria. Escribe <code>print()</code> y, entre los paréntesis, toca <button class="ins" data-snip="m4_win" data-ta="code4">📋 Insertar texto 🏆</button></li>
-            <li>En la línea siguiente, escribe <code>else:</code> sin sangría, al mismo nivel que el <code>if</code>.</li>
-            <li>Dentro del else, imprime el mensaje de derrota. Escribe <code>print()</code> y, entre los paréntesis, toca <button class="ins" data-snip="m4_lose" data-ta="code4">📋 Insertar texto 💀</button></li>
-            <li>Los dos mensajes son f-strings: ya traen <code>{suministro_requerido}</code> para mostrar el suministro.</li>
+            <li>Si <code>es_seguro</code> es verdadero, muestra el mensaje de victoria. <button class="ins" data-snip="m4_win" data-ta="code4">📋 Insertar texto 🏆</button></li>
+            <li>Si no, muestra el mensaje de derrota. <button class="ins" data-snip="m4_lose" data-ta="code4">📋 Insertar texto 💀</button></li>
           </ol>
         </div>
         <div class="expected-box">
