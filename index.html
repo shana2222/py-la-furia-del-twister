@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>La furia del Twister 🌪️</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&family=Fira+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script>window.__pyodideScriptFailed=false;</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js" onerror="window.__pyodideScriptFailed=true"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --rojo:#ff4d4d; --naranja:#ff9900; --verde:#4CAF50; --ambar:#ffd166;
+    --bg:#06070d; --card:#0f1118; --card2:#14171f;
+    --texto:#e8e8e8; --muted:#6b7280;
+    --glow:rgba(255,77,77,.35); --glow2:rgba(255,153,0,.25);
+    --border:rgba(255,77,77,.22);
+    --code-bg:#040404; --code-fg:#e8e8e8; --term-bg:#020305;
+  }
+  body.light{
+    --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb;
+    --texto:#1f2937; --muted:#4b5563;
+    --border:rgba(255,77,77,.4); --glow:rgba(255,77,77,.15);
+    --code-bg:#0d1117; --code-fg:#d1f7e0; --term-bg:#e5e7eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Fira Sans',sans-serif; background:var(--bg); color:var(--texto);
+    line-height:1.7; font-size:16px; min-height:100vh; display:flex; flex-direction:column;
+    transition:background .3s,color .3s;
+    background-image:
+      radial-gradient(at 15% 0%, rgba(255,77,77,.07) 0%, transparent 55%),
+      radial-gradient(at 85% 100%, rgba(255,153,0,.05) 0%, transparent 55%);
+  }
+  body.light{background-image:none}
+
+  /* ── BARRA SUPERIOR ── */
+  header{position:sticky; top:0; z-index:60; background:rgba(6,7,13,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--border)}
+  body.light header{background:rgba(243,244,246,.95)}
+  .header-inner{max-width:1080px; margin:0 auto; padding:0 20px; height:60px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px}
+  .brand{display:flex; align-items:center; gap:10px; min-width:0}
+  .brand .icon{font-size:1.4rem; animation:sway 4s ease-in-out infinite}
+  .brand-logo{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(174,77,255,.45))}
+  @keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+  .brand h1{font-family:'Orbitron',sans-serif; font-size:.95rem; letter-spacing:2px;
+    color:var(--naranja); text-shadow:0 0 14px var(--glow2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .header-right{display:flex; align-items:center; gap:12px}
+  .theme-toggle{background:rgba(255,153,0,.1); border:1px solid var(--naranja); color:var(--naranja);
+    padding:6px 11px; border-radius:8px; cursor:pointer; font-family:'Orbitron',sans-serif;
+    font-size:.6rem; letter-spacing:.5px; transition:all .2s; white-space:nowrap}
+  .theme-toggle:hover{background:var(--naranja); color:#fff}
+  .hdr-report{background:rgba(124,58,237,.14); border:1px solid #7c3aed; color:#b794f6;
+    padding:6px 11px; border-radius:8px; cursor:pointer; font-family:'Orbitron',sans-serif;
+    font-size:.6rem; letter-spacing:.5px; transition:all .2s; white-space:nowrap}
+  .hdr-report:hover{background:#7c3aed; color:#fff}
+  body.light .hdr-report{background:rgba(124,58,237,.1); color:#6d28d9}
+  body.light .hdr-report:hover{background:#7c3aed; color:#fff}
+
+  /* progreso por puntos de pantalla */
+  .steps-dots{display:flex; align-items:center; gap:5px}
+  .sdot{width:9px; height:9px; border-radius:50%; background:#2a2f3a; transition:all .35s}
+  body.light .sdot{background:#d1d5db}
+  .sdot.done{background:var(--verde); box-shadow:0 0 7px rgba(76,175,80,.5)}
+  .sdot.current{background:var(--naranja); transform:scale(1.35); box-shadow:0 0 9px var(--glow2)}
+
+  /* ── ESCENARIO ── */
+  main{flex-grow:1; display:flex; justify-content:center; padding:30px 18px 70px}
+  .stage{max-width:1080px; width:100%; position:relative}
+
+  #loading{position:fixed; inset:0; z-index:300; background:var(--bg);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px}
+  .spinner{width:46px; height:46px; border:4px solid #2a2f3a; border-top-color:var(--naranja);
+    border-radius:50%; animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #loading p{font-family:'Orbitron',sans-serif; color:var(--naranja); font-size:.8rem; letter-spacing:1px; animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+  .screen{display:none; animation:rise .45s ease-out}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0; transform:translateY(16px)}to{opacity:1; transform:translateY(0)}}
+
+  /* recursos visuales de la aventura */
+  .intro-hero{position:relative;min-height:clamp(360px,68vh,720px);display:flex;align-items:flex-end;
+    overflow:hidden;border:1px solid var(--border);border-radius:22px;margin-bottom:24px;
+    background:#05070b url('assets/twister_intro.jpg') center/cover no-repeat;
+    box-shadow:0 22px 70px rgba(0,0,0,.65),0 0 45px rgba(255,77,77,.15)}
+  .intro-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,5,9,.12),rgba(3,5,9,.2) 42%,rgba(3,5,9,.95))}
+  .hero-copy{position:relative;z-index:1;padding:clamp(24px,5vw,54px);max-width:820px}
+  .hero-alert{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid rgba(255,77,77,.7);border-radius:99px;background:rgba(20,0,0,.68);color:#ffaaa0;font:700 .68rem 'Roboto Mono',monospace;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px}
+  .hero-copy h2{font-size:clamp(2.1rem,6vw,4.8rem);color:var(--rojo);text-shadow:0 0 34px rgba(255,77,77,.65);margin-bottom:10px}
+  .hero-copy .lead{color:#f4d8cf;font-size:clamp(.95rem,2vw,1.18rem);margin:0}
+  .mission-visual{margin:0 0 22px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:#030406}
+  .mission-visual img{display:block;width:100%;max-height:420px;object-fit:cover}
+  .mission-visual figcaption{padding:10px 14px;color:var(--muted);font:.68rem 'Roboto Mono',monospace;letter-spacing:.04em}
+  .ending-visual{display:block;width:min(100%,620px);max-height:440px;object-fit:cover;object-position:center bottom;margin:0 auto 24px;border-radius:18px;border:1px solid var(--border)}
+  .narrative-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:22px;align-items:stretch;margin-bottom:24px}
+  .narrative-grid .visual-column{min-width:0;align-self:start}
+  .narrative-grid .video-label{margin-top:0}
+  .narrative-grid .intro-box,.narrative-grid .story-box,.narrative-grid .mission-visual{margin:0;min-width:0}
+  .narrative-grid .mission-visual{display:grid;grid-template-rows:minmax(0,1fr) auto}
+  .narrative-grid .mission-visual img{height:100%;max-height:none;min-height:310px}
+
+  /* eyebrow / títulos */
+  .mission-tag{display:inline-block; font-family:'Roboto Mono',monospace; font-size:.66rem;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--rojo);
+    border:1px solid var(--border); padding:4px 12px; border-radius:99px; margin-bottom:14px}
+  .screen h2{font-family:'Orbitron',sans-serif; font-size:clamp(1.5rem,3.6vw,2.3rem);
+    color:var(--texto); letter-spacing:1px; margin-bottom:8px; line-height:1.2}
+  .screen .lead{font-size:.96rem; color:var(--muted); margin-bottom:22px; max-width:760px}
+
+  /* ── INTRO ── */
+  .video-label{font-family:'Roboto Mono',monospace; font-size:.66rem; color:var(--rojo);
+    letter-spacing:.16em; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:9px}
+  .video-label::after{content:''; flex:1; height:1px; background:var(--border)}
+  .video-wrap{position:relative; aspect-ratio:16/9; min-height:0; overflow:hidden; border-radius:14px;
+    border:1px solid var(--border); margin:0; box-shadow:0 12px 40px rgba(255,77,77,.12)}
+  .video-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:14px}
+  .intro-box{background:rgba(255,153,0,.04); border:1px solid rgba(255,153,0,.2);
+    border-left:4px solid var(--naranja); border-radius:12px; padding:20px 24px; margin-bottom:24px;
+    font-size:.94rem; color:#d4a853; line-height:1.75}
+  body.light .intro-box{background:#fffbeb; color:#92400e}
+  .intro-box strong{color:#ffd080} body.light .intro-box strong{color:#b45309}
+  .intro-box p{margin-bottom:10px} .intro-box p:last-child{margin-bottom:0}
+  .name-card{background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:22px 24px; margin-bottom:8px}
+  .name-card label{display:block; font-family:'Orbitron',sans-serif; font-size:.78rem;
+    color:var(--naranja); letter-spacing:.06em; margin-bottom:12px}
+  .name-row{display:flex; gap:12px; flex-wrap:wrap}
+  .name-input{flex:1; min-width:200px; background:var(--code-bg); border:1px solid var(--border);
+    border-radius:9px; padding:12px 16px; color:#e8e8e8; font-family:'Fira Sans',sans-serif; font-size:1rem; outline:none}
+  .name-input:focus{border-color:rgba(255,153,0,.55); box-shadow:0 0 14px var(--glow2)}
+  .name-input::placeholder{color:#8a8f99}
+  body.light .name-input{background:#ffffff; color:#1f2937; border-color:#d1d5db}
+  body.light .name-input::placeholder{color:#9ca3af}
+  .name-hint{font-size:.78rem; color:var(--muted); margin-top:10px}
+
+  /* ── STORY ── */
+  .story-box{background:linear-gradient(135deg,rgba(30,6,6,.8),rgba(20,4,4,.9));
+    border:1px solid rgba(255,77,77,.2); border-left:4px solid var(--rojo);
+    border-radius:0 12px 12px 0; padding:18px 22px; margin-bottom:22px; font-size:.93rem;
+    line-height:1.7; position:relative; overflow:hidden}
+  body.light .story-box{background:linear-gradient(135deg,#fff0f0,#ffe5e5)}
+  .story-timestamp{font-family:'Roboto Mono',monospace; font-size:.64rem; color:rgba(255,77,77,.7);
+    letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px}
+  .story-timestamp::before{content:''; width:6px; height:6px; border-radius:50%;
+    background:var(--rojo); box-shadow:0 0 8px var(--rojo); animation:blink 1.5s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .story-box p{color:#e8c8c0; margin-bottom:8px} body.light .story-box p{color:#374151}
+  .story-box p:last-child{margin-bottom:0}
+  .story-box strong{color:#ffa0a0} body.light .story-box strong{color:#b91c1c}
+  .story-box em{font-style:italic}
+  .story-data{background:rgba(255,77,77,.07); border:1px solid rgba(255,77,77,.15); border-radius:6px;
+    padding:8px 13px; margin-top:10px; font-family:'Roboto Mono',monospace; font-size:.8rem; color:#ff9080}
+  body.light .story-data{background:rgba(255,77,77,.1); color:#b91c1c}
+
+  /* ── FLASHCARDS (tamaño corregido) ── */
+  .fc-section-label{font-family:'Roboto Mono',monospace; font-size:.64rem; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.14em; margin-bottom:12px; display:flex; align-items:center; gap:9px}
+  .fc-section-label::after{content:''; flex:1; height:1px; background:rgba(255,255,255,.06)}
+  body.light .fc-section-label::after{background:rgba(0,0,0,.08)}
+  .fc-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:14px; margin-bottom:24px}
+  .fc{height:220px; min-width:0; perspective:900px; cursor:pointer}
+  .fc-in{width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .52s cubic-bezier(.4,0,.2,1)}
+  .fc:hover .fc-in, .fc.flipped .fc-in{transform:rotateY(180deg)}
+  .fc-f,.fc-b{position:absolute; inset:0; min-width:0; backface-visibility:hidden; border-radius:12px; padding:16px;
+    display:flex; flex-direction:column; justify-content:center; overflow:hidden}
+  .fc-b{overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(255,153,0,.45) transparent}
+  .fc-f{background:var(--card2); border:1px solid rgba(255,153,0,.25); align-items:flex-start; text-align:left}
+  body.light .fc-f{background:#fff}
+  .fc-b{background:#0c0a00; border:1px solid rgba(255,153,0,.45); transform:rotateY(180deg); justify-content:center}
+  body.light .fc-b{background:#fffbeb}
+  .fc-f h4{font-family:'Orbitron',sans-serif; font-size:.9rem; color:var(--naranja); margin-bottom:6px}
+  .fc-f small{font-size:.68rem; color:var(--muted)}
+  .fc-f .flip-tag{margin-top:auto; font-family:'Roboto Mono',monospace; font-size:.6rem; color:rgba(255,153,0,.5); letter-spacing:.08em}
+  .fc-b p{font-size:clamp(.7rem,1.05vw,.78rem); color:#e0c080; line-height:1.45; margin-bottom:8px; overflow-wrap:anywhere}
+  body.light .fc-b p{color:#92400e}
+  .fc-b code{display:block; max-width:100%; font-family:'Roboto Mono',monospace; font-size:clamp(.64rem,.95vw,.73rem); color:#ffe080;
+    background:rgba(255,220,0,.06); padding:7px 9px; border-radius:5px; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word}
+  body.light .fc-b code{background:rgba(255,153,0,.12); color:#b45309}
+
+  /* ── LAYOUT DIVIDIDO tarea | consola ── */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start}
+  .split-pane{min-width:0}
+  .pane-label{font-family:'Roboto Mono',monospace; font-size:.62rem; color:var(--muted);
+    letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px}
+
+  .alert-banner{background:rgba(255,77,77,.08); border:1px solid rgba(255,77,77,.3); border-radius:10px;
+    padding:12px 16px; margin-bottom:16px; display:flex; align-items:flex-start; gap:11px;
+    font-size:.86rem; color:#ffb0a0; animation:alert-pulse 3s infinite}
+  body.light .alert-banner{color:#b91c1c}
+  @keyframes alert-pulse{0%,100%{background:rgba(255,77,77,.08)}50%{background:rgba(255,77,77,.13)}}
+  .alert-icon{font-size:1.2rem; flex-shrink:0}
+  .alert-banner strong{color:#ff7060} body.light .alert-banner strong{color:#dc2626}
+
+  .consigna{background:#050f05; border:1px solid rgba(76,175,80,.18); border-left:3px solid var(--verde);
+    border-radius:10px; padding:16px 18px; margin-bottom:14px}
+  body.light .consigna{background:#f0fdf4}
+  .consigna-title{font-family:'Orbitron',sans-serif; font-size:.7rem; color:var(--verde);
+    text-transform:uppercase; letter-spacing:.14em; margin-bottom:11px}
+  .consigna p{font-size:.87rem; color:#b8d4b8; line-height:1.7; margin-bottom:9px}
+  body.light .consigna p, body.light .consigna ol, body.light .consigna li{color:#166534}
+  .consigna ol{padding-left:19px; font-size:.87rem; color:#b8d4b8; line-height:1.8}
+  .consigna li{margin-bottom:6px}
+  .consigna strong{color:#a5d6a7} body.light .consigna strong{color:#15803d}
+  .consigna em{font-style:italic}
+
+  .expected-box{background:#080800; border:1px solid rgba(255,153,0,.18); border-radius:10px;
+    padding:12px 16px; margin-bottom:14px}
+  body.light .expected-box{background:#fdf6e3}
+  .expected-label{font-family:'Roboto Mono',monospace; font-size:.62rem; color:var(--naranja);
+    text-transform:uppercase; letter-spacing:.13em; margin-bottom:7px}
+  .expected-box pre{font-family:'Roboto Mono',monospace; font-size:.8rem; color:#ffd080; white-space:pre-wrap; line-height:1.7; margin:0}
+  body.light .expected-box pre{color:#b45309}
+
+  .tip-card{background:rgba(255,77,77,.04); border:1px solid rgba(255,77,77,.12); border-left:3px solid rgba(255,77,77,.4);
+    border-radius:10px; padding:12px 16px; margin-bottom:14px; display:flex; gap:11px; align-items:flex-start}
+  .tip-icon{font-size:1.05rem; flex-shrink:0}
+  .tip-card p{font-size:.84rem; color:#c88080; line-height:1.6; margin:0}
+  body.light .tip-card p{color:#9a3030}
+  .tip-card strong{color:#e0a0a0} body.light .tip-card strong{color:#b91c1c}
+  .tip-card em{font-style:italic}
+
+  /* editor + consola */
+  .ed-bar{display:flex; align-items:center; gap:7px; background:#020202; padding:7px 12px;
+    border-radius:9px 9px 0 0; border:1px solid rgba(255,77,77,.18); border-bottom:none}
+  body.light .ed-bar{background:#e5e7eb; border-color:#d1d5db}
+  .ed-dot{width:10px; height:10px; border-radius:50%}
+  .ed-bar .fname{margin-left:7px; font-family:'Roboto Mono',monospace; font-size:.66rem; color:var(--muted)}
+  textarea{width:100%; min-height:200px; padding:14px 16px; border-radius:0 0 9px 9px;
+    background:var(--code-bg); color:var(--code-fg); border:1px solid rgba(255,77,77,.18); border-top:none;
+    resize:vertical; font-family:'Roboto Mono',monospace; font-size:.87rem; line-height:1.7; outline:none; tab-size:4;
+    transition:border-color .2s, background .3s, color .3s}
+  body.light textarea{border-color:#d1d5db}
+  textarea:focus{border-color:rgba(255,77,77,.45); box-shadow:0 0 18px var(--glow)}
+  .btn-row{display:flex; align-items:center; gap:12px; margin:12px 0; flex-wrap:wrap}
+  .term{background:var(--term-bg); border:1px dashed rgba(255,153,0,.35); border-radius:9px;
+    padding:14px 16px; min-height:200px; font-family:'Roboto Mono',monospace; font-size:.82rem;
+    color:#d0d8e8; white-space:pre-wrap; line-height:1.65}
+  body.light .term{color:#1f2937}
+  .term.empty{display:flex; align-items:center; justify-content:center; color:var(--muted); font-style:italic; text-align:center}
+
+  .status-message{font-family:'Orbitron',sans-serif; font-size:.72rem; letter-spacing:.05em; min-height:1em}
+  .status-pass{color:var(--verde); text-shadow:0 0 8px rgba(76,175,80,.5)}
+  .status-fail{color:var(--rojo)}
+  .status-warn{color:var(--naranja)}
+
+  /* botones */
+  .btn{font-family:'Orbitron',sans-serif; font-size:.73rem; font-weight:700; letter-spacing:.8px;
+    text-transform:uppercase; padding:11px 22px; border:none; border-radius:9px; cursor:pointer; transition:all .2s}
+  .btn-red{background:var(--rojo); color:#fff}
+  .btn-red:hover{transform:translateY(-2px); box-shadow:0 7px 22px rgba(255,77,77,.45)}
+  .btn-go{background:linear-gradient(135deg,var(--naranja),var(--rojo)); color:#fff; box-shadow:0 4px 20px rgba(255,153,0,.3)}
+  .btn-go:hover{transform:translateY(-2px); box-shadow:0 7px 28px rgba(255,153,0,.45)}
+  .btn-go:disabled{background:#2a2020; color:#5a4a4a; cursor:not-allowed; transform:none; box-shadow:none}
+  .btn-ghost{background:transparent; color:var(--naranja); border:1px solid rgba(255,153,0,.4)}
+  .btn-ghost:hover{background:rgba(255,153,0,.08)}
+  .btn-pdf{background:linear-gradient(135deg,var(--verde),#2E7D32); color:#fff}
+  .btn-pdf:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(76,175,80,.4)}
+  .btn-report{background:linear-gradient(135deg,#7c3aed,#4f2ec9); color:#fff}
+  .btn-report:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,58,237,.45)}
+
+  /* barra inferior de navegación de pantalla */
+  .nav-bar{display:flex; justify-content:space-between; align-items:center; gap:12px;
+    margin-top:26px; padding-top:20px; border-top:1px dashed rgba(255,153,0,.2); flex-wrap:wrap}
+  body.light .nav-bar{border-color:#d1d5db}
+  .nav-spacer{flex:1}
+
+  /* cierre */
+  .ending{text-align:center; padding:14px 0}
+  .ending .big{font-size:3.2rem}
+  .ending .verdict{font-family:'Orbitron',sans-serif; font-size:clamp(1.6rem,5vw,2.5rem);
+    margin:14px 0 10px; letter-spacing:1px; line-height:1.2}
+  .ending .detail{font-size:1rem; color:var(--muted); margin:0 auto 18px; max-width:560px}
+  .keyword{display:inline-block; font-family:'Roboto Mono',monospace; font-size:1.4rem;
+    letter-spacing:5px; color:var(--ambar); background:rgba(255,209,102,.08);
+    border:1px solid rgba(255,209,102,.4); padding:12px 28px; border-radius:10px; margin-top:6px}
+  .recap{max-width:520px; margin:26px auto 0; text-align:left}
+  .recap-row{display:flex; justify-content:space-between; gap:12px; padding:10px 14px;
+    border:1px solid rgba(255,255,255,.06); border-radius:8px; margin-bottom:7px; font-size:.87rem}
+  body.light .recap-row{border-color:rgba(0,0,0,.08)}
+  .recap-row .m{color:var(--muted)}
+  .ending-actions{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:26px}
+
+  footer{text-align:center; padding:26px 20px; border-top:1px solid var(--border)}
+  footer p{font-size:.76rem; color:var(--muted)}
+
+  /* responsive: la pantalla dividida se apila */
+  @media(max-width:780px){
+    .split{grid-template-columns:1fr}
+    .term{min-height:120px}
+    .narrative-grid{grid-template-columns:1fr;gap:16px;margin-bottom:22px}
+    .narrative-grid .mission-visual img{height:auto;min-height:0;aspect-ratio:1/1}
+    .fc-row{grid-template-columns:1fr;gap:12px}
+    .fc{height:225px}
+    .intro-hero{min-height:min(72vh,540px);background-position:center top}
+    main{padding:20px 12px 52px}
+    .story-box,.intro-box{padding:17px 18px}
+  }
+  @media(max-width:520px){
+    .header-inner{height:auto;min-height:60px;padding:8px 12px;flex-wrap:wrap}
+    .brand{width:100%}
+    .header-right{width:100%;justify-content:space-between;gap:8px}
+    .theme-toggle{padding:5px 8px;font-size:.55rem}
+    .hdr-report{padding:5px 8px;font-size:.55rem}
+    .sdot{width:7px;height:7px}
+    .steps-dots{gap:4px}
+    .hero-copy{padding:24px 20px}
+    .hero-copy h2{font-size:clamp(2rem,12vw,3.1rem)}
+    .mission-tag{font-size:.58rem}
+    .screen h2{font-size:clamp(1.35rem,8vw,1.9rem)}
+    .btn{width:100%;padding:11px 14px}
+    .nav-bar .nav-spacer{display:none}
+    .fc{height:235px}
+    .fc-f,.fc-b{padding:15px}
+  }
+
+  /* ══════════ REVISIÓN 2026-11: menos texto, más visual ══════════ */
+  .snd-toggle{background:rgba(76,175,80,.1); border:1px solid var(--verde); color:var(--verde);
+    padding:6px 11px; border-radius:8px; cursor:pointer; font-family:'Orbitron',sans-serif;
+    font-size:.6rem; letter-spacing:.5px; white-space:nowrap; transition:all .2s}
+  .snd-toggle:hover{background:var(--verde); color:#fff}
+  .snd-toggle.off{border-color:var(--muted); color:var(--muted); background:transparent}
+  @media(max-width:520px){ .snd-toggle{padding:5px 8px;font-size:.55rem} }
+
+  /* etiquetas numeradas: orden de lectura */
+  .step-label{display:flex; align-items:center; gap:9px; font-family:'Orbitron',sans-serif;
+    font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--naranja); margin-bottom:10px}
+  .num{display:inline-grid; place-items:center; width:24px; height:24px; flex-shrink:0; border-radius:50%;
+    background:var(--naranja); color:#111; font:900 .72rem 'Orbitron',sans-serif; box-shadow:0 0 10px var(--glow2)}
+  .name-card label{display:flex; align-items:center; gap:9px}
+
+  /* video propio */
+  .vid{position:relative; aspect-ratio:1/1; border-radius:16px; overflow:hidden; border:1px solid var(--border);
+    background:#000; box-shadow:0 12px 40px rgba(255,77,77,.14)}
+  .vid video{display:block; width:100%; height:100%; object-fit:cover}
+  details.yt{margin-top:14px; border:1px solid var(--border); border-radius:12px; padding:10px 14px; background:var(--card)}
+  details.yt summary{cursor:pointer; font-size:.85rem; color:var(--muted)}
+  details.yt .video-wrap{margin-top:12px}
+
+  /* datos clave en lugar de párrafos */
+  .facts{list-style:none; display:grid; gap:10px}
+  .facts li{display:flex; gap:12px; align-items:center; background:var(--card); border:1px solid var(--border);
+    border-left:4px solid var(--naranja); border-radius:12px; padding:12px 16px; font-size:1rem}
+  .facts .fi{font-size:1.45rem; flex-shrink:0}
+  .facts strong{color:var(--naranja)}
+
+  .story-box p{font-size:1rem}
+  .story-box.compact{margin-bottom:14px; padding:12px 16px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+  .chip{font:600 .82rem 'Fira Sans',sans-serif; padding:6px 12px; border-radius:99px;
+    background:rgba(255,153,0,.1); border:1px solid rgba(255,153,0,.35); color:var(--texto)}
+
+  .supply-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px}
+  .supply{display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px; border-radius:10px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,153,0,.2); font-size:.72rem; text-align:center}
+  body.light .supply{background:#fff}
+  .supply .ic{font-size:1.5rem; line-height:1.1}
+
+  /* consigna corta */
+  .consigna .goal{font-size:1rem; color:var(--texto); margin-bottom:10px; line-height:1.5}
+  body.light .consigna .goal{color:#14532d}
+  .consigna ol{font-size:.92rem}
+  .consigna code,.hint code,.diag code{font-family:'Roboto Mono',monospace; font-size:.85em; padding:1px 6px; border-radius:5px;
+    background:rgba(76,175,80,.12); color:#a5f3a8}
+  body.light .consigna code, body.light .hint code, body.light .diag code{background:#dcfce7; color:#166534}
+
+  /* botones de insertar texto exacto */
+  .ins{display:inline-flex; align-items:center; gap:4px; margin:3px 4px 3px 0; padding:4px 10px; border-radius:7px; cursor:pointer;
+    font:700 .7rem 'Roboto Mono',monospace; color:#111; background:var(--ambar); border:1px solid #e0b040;
+    box-shadow:0 2px 0 #a07a20; transition:transform .12s, box-shadow .12s; vertical-align:middle}
+  .ins:hover{transform:translateY(-1px); box-shadow:0 3px 0 #a07a20}
+  .ins:active{transform:translateY(1px); box-shadow:0 1px 0 #a07a20}
+  .ins.done{background:var(--verde); border-color:#2E7D32; color:#fff; box-shadow:0 2px 0 #1b5e20}
+  .ins-row{display:flex; flex-wrap:wrap; gap:4px; margin-top:10px; padding-top:8px; border-top:1px dashed rgba(255,153,0,.25)}
+  textarea.flash{animation:taflash .6s ease-out}
+  @keyframes taflash{from{box-shadow:0 0 0 3px rgba(255,209,102,.8)}to{box-shadow:none}}
+
+  /* plegables: tarjetas y pistas */
+  details.cards{margin-bottom:20px; border:1px dashed rgba(255,153,0,.35); border-radius:12px; padding:10px 14px}
+  details.cards summary{cursor:pointer; font-family:'Roboto Mono',monospace; font-size:.8rem; color:var(--naranja)}
+  details.cards[open] summary{margin-bottom:14px}
+  details.cards .fc-row{margin-bottom:6px}
+  details.hint{border:1px solid rgba(255,77,77,.25); border-radius:10px; padding:9px 14px; margin-bottom:14px; background:rgba(255,77,77,.04)}
+  details.hint summary{cursor:pointer; font-weight:600; font-size:.88rem; color:#ff9080}
+  body.light details.hint summary{color:#b91c1c}
+  details.hint p{margin-top:8px; font-size:.88rem; color:var(--texto); line-height:1.6}
+
+  /* diagramas */
+  .diag{min-width:0; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px}
+  .diag-title{font-family:'Orbitron',sans-serif; font-size:.72rem; letter-spacing:.06em; color:var(--naranja); margin:4px 0 10px}
+  .diag-foot{margin-top:12px; font-size:.85rem; color:var(--muted); text-align:center}
+  .diag-foot.hit{color:var(--verde); font-weight:700}
+
+  .idx-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .idx-col{display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px; border-radius:12px;
+    border:1px solid rgba(255,255,255,.07); transition:all .35s}
+  body.light .idx-col{border-color:#e5e7eb}
+  .idx-user{width:52px; height:52px; display:grid; place-items:center; border-radius:50%; font:900 1.5rem 'Orbitron',sans-serif;
+    background:rgba(255,153,0,.15); border:2px solid var(--naranja); color:var(--naranja)}
+  .idx-arrow{font:700 .8rem 'Roboto Mono',monospace; color:var(--rojo); text-align:center; line-height:1.2}
+  .idx-py{font:700 .78rem 'Roboto Mono',monospace; padding:6px 8px; border-radius:7px; background:rgba(76,175,80,.14);
+    border:1px solid rgba(76,175,80,.5); color:#a5f3a8; white-space:nowrap}
+  body.light .idx-py{color:#166534}
+  .idx-name{font-size:.8rem; text-align:center}
+  .idx-col.hit{border-color:var(--verde); background:rgba(76,175,80,.1); box-shadow:0 0 18px rgba(76,175,80,.35); transform:translateY(-3px)}
+  .idx-legend{display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:.72rem; color:var(--muted)}
+  .idx-legend span::before{content:''; display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px}
+  .lg-user::before{background:var(--naranja)} .lg-py::before{background:var(--verde)}
+
+  .flow{display:flex; flex-direction:column; align-items:center; gap:10px}
+  .fl-node{padding:8px 12px; border-radius:9px; border:1px solid rgba(255,153,0,.4); background:rgba(255,153,0,.06);
+    font:.78rem 'Roboto Mono',monospace; text-align:center; line-height:1.5}
+  .fl-cond{border:2px solid var(--naranja); border-radius:14px; background:rgba(255,153,0,.12)}
+  .fl-branches{display:grid; grid-template-columns:1.3fr 1fr; gap:12px; width:100%}
+  .fl-col{display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px; border-radius:10px; border:1px dashed rgba(255,255,255,.1)}
+  .fl-tag{font:700 .72rem 'Roboto Mono',monospace; padding:2px 10px; border-radius:99px}
+  .fl-tag.ok{background:rgba(76,175,80,.2); color:var(--verde)}
+  .fl-tag.bad{background:rgba(255,77,77,.18); color:var(--rojo)}
+  .fl-loop{font:700 .72rem 'Roboto Mono',monospace; color:var(--verde)}
+  .fl-end{font:700 .72rem 'Roboto Mono',monospace; color:var(--muted)}
+
+  .valija{margin-top:14px}
+  .valija-label{font:700 .78rem 'Orbitron',sans-serif; color:var(--texto); margin-bottom:8px; display:flex; justify-content:space-between}
+  .slots{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+  .slot{aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    border-radius:10px; border:2px dashed rgba(255,153,0,.3); font-size:.62rem; color:var(--muted); text-align:center; overflow:hidden; padding:2px}
+  .slot .ic{font-size:1.4rem}
+  .slot.full{border-style:solid; border-color:var(--naranja); background:rgba(255,153,0,.1); color:var(--texto); animation:pop .35s ease-out}
+  .slot.match{border-color:var(--verde); background:rgba(76,175,80,.2); box-shadow:0 0 14px rgba(76,175,80,.5)}
+  .slots.small .slot .ic{font-size:1.1rem}
+  @keyframes pop{from{transform:scale(.6); opacity:0}to{transform:scale(1); opacity:1}}
+
+  .ruleta{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+  .ruleta .supply{transition:all .12s}
+  .ruleta .supply.spin{border-color:var(--ambar); background:rgba(255,209,102,.25); transform:scale(1.06)}
+  .ruleta .supply.pick{border-color:var(--rojo); background:rgba(255,77,77,.25); box-shadow:0 0 16px rgba(255,77,77,.55); transform:scale(1.1)}
+  .check-row{margin:12px 0 10px; text-align:center; font-size:.82rem; line-height:2}
+  .bool{display:inline-block; min-width:64px; padding:2px 10px; border-radius:8px; font:900 .85rem 'Roboto Mono',monospace;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2)}
+  .bool.t{background:rgba(76,175,80,.25); border-color:var(--verde); color:var(--verde)}
+  .bool.f{background:rgba(255,77,77,.2); border-color:var(--rojo); color:var(--rojo)}
+
+  .fork{display:flex; flex-direction:column; align-items:center}
+  .fork-top{padding:8px 18px; border-radius:10px; border:2px solid var(--naranja); font:700 .9rem 'Roboto Mono',monospace; background:rgba(255,153,0,.1)}
+  .fork-lines{display:grid; grid-template-columns:1fr 1fr; width:60%; height:22px}
+  .fork-lines span:first-child{border-left:2px solid var(--verde); border-top:2px solid var(--verde); border-top-left-radius:10px; margin-left:0; translate:0 50%}
+  .fork-lines span:last-child{border-right:2px solid var(--rojo); border-top:2px solid var(--rojo); border-top-right-radius:10px; translate:0 50%}
+  .fork-row{display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; margin-top:10px}
+  .fork-b{display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 8px; border-radius:12px; font:.78rem 'Roboto Mono',monospace;
+    opacity:.75; transition:all .35s}
+  .fork-b span{font:700 1rem 'Fira Sans',sans-serif}
+  .fork-b.ok{border:2px solid var(--verde); background:rgba(76,175,80,.08)}
+  .fork-b.bad{border:2px solid var(--rojo); background:rgba(255,77,77,.08)}
+  .fork-b.on{opacity:1; transform:scale(1.05); box-shadow:0 0 22px currentColor}
+  .fork-b.ok.on{color:var(--verde)} .fork-b.bad.on{color:var(--rojo)}
+  .fork-b.dim{opacity:.3; filter:grayscale(1)}
+
+  /* pantalla de cierre: sacudida y destello */
+  .ending-visual.lose{filter:grayscale(.7) sepia(.4) hue-rotate(-30deg) brightness(.7)}
+  .shake{animation:shake .5s ease-in-out 2}
+  @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-2px)}}
+  .flashbang{position:fixed; inset:0; z-index:400; pointer-events:none; background:#fff; animation:flashbang .7s ease-out forwards}
+  @keyframes flashbang{0%{opacity:.85}100%{opacity:0}}
+
+  .narrative-grid > .story-box{align-self:start}
+  .idx-col{min-width:0}
+  #bootStatus{border-radius:14px !important}
+  @media(max-width:520px){
+    .idx-grid{gap:6px}
+    .idx-user{width:42px; height:42px; font-size:1.2rem}
+    .idx-py{font-size:.66rem; padding:5px 4px}
+    .idx-name{font-size:.72rem}
+    .slot{font-size:.55rem}
+    .fork-lines{width:70%}
+  }
+  @media(max-width:780px){
+    .fl-branches{grid-template-columns:1fr}
+    .ruleta{grid-template-columns:repeat(3,1fr)}
+    .vid{max-width:520px; margin:0 auto}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Iniciando terminal de emergencia…</p>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <img class="brand-logo" src="assets/logoCC.png" alt="Logo de pensamiento computacional"/>
+      <h1 id="brandTitle">LA FURIA DEL TWISTER</h1>
+    </div>
+    <div class="header-right">
+      <button class="hdr-report" onclick="descargarReporteDesempeno()" id="reportBtn" title="Generar el reporte de desempeño para la libreta de CREA">📊 Reporte</button>
+      <button class="snd-toggle" onclick="toggleSound()" id="sndBtn" title="Activar o silenciar sonidos">🔇 Sonido</button>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Modo claro</button>
+      <div class="steps-dots" id="dots"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+
+  <!-- ════════ PANTALLA 0 — INTRO ════════ -->
+  <section class="screen active" data-screen="0">
+    <div class="intro-hero" role="img" aria-label="Un twister nivel 5 se aproxima a un búnker">
+      <div class="hero-copy">
+        <div class="hero-alert">⚠ alerta máxima — nivel 5 ⚠</div>
+        <h2>🌪️ TWISTER<br>NIVEL 5</h2>
+        <p class="lead">Tu misión: sobrevivir. Cada línea de código cuenta.</p>
+      </div>
+    </div>
+
+    <div class="narrative-grid">
+      <div class="visual-column">
+        <div class="step-label"><span class="num">1</span> Mira la transmisión</div>
+        <div class="vid"><video id="vid-0" src="assets/v_intro.mp4" poster="assets/twister_intro.jpg" controls playsinline preload="metadata"></video></div>
+      </div>
+      <div>
+        <div class="step-label"><span class="num">2</span> Lo que tienes que saber</div>
+        <ul class="facts">
+          <li><span class="fi">⏱️</span><span>El twister llega en <strong>47 minutos</strong>.</span></li>
+          <li><span class="fi">🐍</span><span>Vas a programar en Python el sistema de emergencia.</span></li>
+          <li><span class="fi">🗺️</span><span><strong>4 misiones</strong>: refugio, valija, verificación y final.</span></li>
+          <li><span class="fi">🔒</span><span>Cada paso se abre cuando el anterior funciona.</span></li>
+        </ul>
+        <details class="yt">
+          <summary>📺 Ver un tornado real (YouTube)</summary>
+          <div class="video-wrap">
+            <iframe src="https://www.youtube.com/embed/mgaWns-DGHk" title="Tornados nivel 5" frameborder="0" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="name-card">
+      <label for="playerName"><span class="num">3</span> Escribe tu nombre de operador</label>
+      <div class="name-row">
+        <input class="name-input" id="playerName" type="text" maxlength="24" placeholder="Tu nombre…" autocomplete="off"/>
+        <button class="btn btn-go" id="startBtn" onclick="startMission()">Iniciar operación →</button>
+      </div>
+      <p class="name-hint">Si lo dejas vacío, serás <em>«operador»</em>. Activa el sonido 🔊 arriba a la derecha.</p>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 1 — M1 P1 ════════ -->
+  <section class="screen" data-screen="1">
+    <span class="mission-tag">// misión 01 de 04 · paso 1</span>
+    <h2>🏕️ Búsqueda de refugio</h2>
+    <div class="narrative-grid">
+      <div class="visual-column">
+        <div class="step-label"><span class="num">1</span> Mira</div>
+        <div class="vid"><video id="vid-1" src="assets/v_m1.mp4" poster="assets/mapa.jpg" controls playsinline preload="metadata"></video></div>
+      </div>
+      <div class="story-box">
+        <div class="story-timestamp">⬤ en vivo · t-47 minutos</div>
+        <p id="m1p1-story1"></p>
+        <div class="chips"><span class="chip">🕳️ Subterráneo</span><span class="chip">⛰️ en las Montañas</span><span class="chip">🌲 en el Bosque</span></div>
+      </div>
+    </div>
+
+    <details class="cards">
+      <summary>🃏 ¿Necesitas repasar? Abre las tarjetas <small>(4)</small></summary>
+      <div class="fc-row">
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>Bucle FOR</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Recorre cada elemento de una lista, uno por vuelta.</p><code>for elemento in lista:
+    print(elemento)</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>Contador + FOR</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Un contador numera los elementos mientras los recorres.</p><code>contador = 1
+for elem in lista:
+    print(contador, elem)
+    contador += 1</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>Indexación</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Cada elemento tiene una posición. La primera es 0.</p><code>lista[0]  # primero
+lista[1]  # segundo
+lista[2]  # tercero</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>input()</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Lee lo que escribe la persona. Para usarlo como número, conviértelo con int().</p><code>texto = input("¿Qué eliges? ")
+numero = int(input("Número: "))</code></div>
+        </div></div>
+      </div>
+    </details>
+
+    <div class="split">
+      <div class="split-pane">
+        <div class="step-label"><span class="num">2</span> Tu tarea</div>
+        <div class="consigna">
+          <p class="goal">🎯 Muestra los 3 refugios numerados con un bucle <strong>for</strong>.</p>
+          <ol>
+            <li>Crea la lista <code>refugios</code> <button class="ins" data-snip="m1_lista" data-ta="code1_step1">📋 Insertar lista</button></li>
+            <li>Antes del bucle: <code>contador = 1</code></li>
+            <li>En cada vuelta, imprime número, punto y refugio.</li>
+            <li>Suma 1 al contador al final de la vuelta.</li>
+          </ol>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">▸ Salida esperada</div>
+          <pre>1. Subterráneo
+2. en las Montañas
+3. en el Bosque</pre>
+          <div class="ins-row"><button class="ins" data-snip="m1_print" data-ta="code1_step1">📋 Insertar print</button></div>
+        </div>
+        <details class="hint" data-step="m1s1">
+          <summary>💡 Pista</summary>
+          <p>Mira la tarjeta <strong>«Contador + FOR»</strong>: creas el contador antes, lo usas adentro y lo aumentas al final de cada vuelta.</p>
+        </details>
+      </div>
+
+      <div class="split-pane">
+        <div class="step-label"><span class="num">3</span> Programa y ejecuta</div>
+        <div class="ed-bar">
+          <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+          <span class="fname">mision1_paso1.py</span>
+        </div>
+        <textarea id="code1_step1" spellcheck="false"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-red" onclick="runStep1('1')">▶ Ejecutar</button>
+          <button class="btn btn-pdf" onclick="descargarPDF('code1_step1', 'Misión 1 - Paso 1: Lista de Refugios')">📄 PDF</button>
+          <span id="status1_step1" class="status-message"></span>
+        </div>
+        <div class="pane-label">▸ salida</div>
+        <div class="term empty" id="out1_step1">La salida de tu código aparecerá aquí.</div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn btn-ghost" onclick="goTo(0)">← Intro</button>
+      <div class="nav-spacer"></div>
+      <button class="btn btn-go" id="next-1" onclick="goTo(2)" disabled>Paso 2 →</button>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 2 — M1 P2 ════════ -->
+  <section class="screen" data-screen="2">
+    <span class="mission-tag">// misión 01 de 04 · paso 2</span>
+    <h2>🏕️ Elige el refugio</h2>
+    <div class="narrative-grid">
+      <div class="diag" id="diag-idx">
+        <div class="step-label"><span class="num">1</span> Mira: la persona cuenta desde 1, Python desde 0</div>
+        <div class="idx-grid">
+          <div class="idx-col" data-i="0"><div class="idx-user">1</div><div class="idx-arrow">− 1<br>↓</div><div class="idx-py">refugios[0]</div><div class="idx-name">🕳️ Subterráneo</div></div>
+          <div class="idx-col" data-i="1"><div class="idx-user">2</div><div class="idx-arrow">− 1<br>↓</div><div class="idx-py">refugios[1]</div><div class="idx-name">⛰️ en las Montañas</div></div>
+          <div class="idx-col" data-i="2"><div class="idx-user">3</div><div class="idx-arrow">− 1<br>↓</div><div class="idx-py">refugios[2]</div><div class="idx-name">🌲 en el Bosque</div></div>
+        </div>
+        <div class="idx-legend"><span class="lg-user">número que escribe la persona</span><span class="lg-py">posición en la lista</span></div>
+        <div class="diag-foot" id="idx-result">Ejecuta tu código: el refugio elegido se va a iluminar.</div>
+      </div>
+      <div class="story-box">
+        <div class="story-timestamp">⬤ en vivo · t-38 minutos</div>
+        <p id="m1p2-story1"></p>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="split-pane">
+        <div class="step-label"><span class="num">2</span> Tu tarea</div>
+        <div class="consigna">
+          <p class="goal">🎯 Pide un número del 1 al 3 y guarda el refugio elegido.</p>
+          <ol>
+            <li>Pide el número con <code>input()</code> y conviértelo con <code>int()</code>. <button class="ins" data-snip="m1_input" data-ta="code1_step2">📋 Insertar input</button></li>
+            <li>Réstale 1 para obtener la posición (mira el diagrama).</li>
+            <li>Guarda el refugio en <code>refugio_usuario</code>.</li>
+            <li>Muestra cuál eligió.</li>
+          </ol>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">▸ Si la persona escribe 2</div>
+          <pre>Has elegido: en las Montañas</pre>
+          <div class="ins-row"><button class="ins" data-snip="m1_print2" data-ta="code1_step2">📋 Insertar print</button></div>
+        </div>
+        <details class="hint" data-step="m1s2">
+          <summary>💡 Pista</summary>
+          <p>La persona ve 1, 2, 3. Python usa 0, 1, 2. Siempre hay <strong>1 de diferencia</strong>. Repasa la tarjeta «Indexación» del paso 1.</p>
+        </details>
+      </div>
+
+      <div class="split-pane">
+        <div class="step-label"><span class="num">3</span> Programa y ejecuta</div>
+        <div class="ed-bar">
+          <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+          <span class="fname">mision1_paso2.py</span>
+        </div>
+        <textarea id="code1_step2" spellcheck="false"># La lista "refugios" del Paso 1 ya está en memoria.
+</textarea>
+        <div class="btn-row">
+          <button class="btn btn-red" onclick="runStep2('1')">▶ Ejecutar</button>
+          <button class="btn btn-pdf" onclick="descargarPDF('code1_step2', 'Misión 1 - Paso 2: Elección de Refugio')">📄 PDF</button>
+          <span id="status1_step2" class="status-message"></span>
+        </div>
+        <div class="pane-label">▸ salida</div>
+        <div class="term empty" id="out1_step2">La salida de tu código aparecerá aquí.</div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn btn-ghost" onclick="goTo(1)">← Paso 1</button>
+      <div class="nav-spacer"></div>
+      <button class="btn btn-go" id="next-2" onclick="goTo(3)" disabled>Misión 2 →</button>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 3 — M2 P1 ════════ -->
+  <section class="screen" data-screen="3">
+    <span class="mission-tag">// misión 02 de 04 · paso 1</span>
+    <h2>🎒 Recolección frenética</h2>
+    <div class="narrative-grid">
+      <div class="visual-column">
+        <div class="step-label"><span class="num">1</span> Mira</div>
+        <div class="vid"><video id="vid-3" src="assets/v_m2.mp4" poster="assets/suministros.jpg" controls playsinline preload="metadata"></video></div>
+      </div>
+      <div class="story-box">
+        <div class="story-timestamp">⬤ en vivo · t-31 minutos</div>
+        <p id="m2p1-story1"></p>
+        <div class="supply-grid" id="supply-grid-m2"></div>
+      </div>
+    </div>
+
+    <details class="cards">
+      <summary>🃏 ¿Necesitas repasar? Abre las tarjetas <small>(4)</small></summary>
+      <div class="fc-row">
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>Bucle WHILE</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Se repite mientras la condición sea verdadera. Cuando es falsa, se detiene.</p><code>while condicion:
+    # bloque
+    # actualizar condicion</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>.append()</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Agrega un elemento al final de una lista.</p><code>lista = []
+lista.append("elemento")
+# lista → ["elemento"]</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>len()</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Dice cuántos elementos tiene una lista.</p><code>len([1, 2, 3])  # → 3
+len(mi_lista) &lt; 5  # True/False</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>AND lógico</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Las dos condiciones tienen que ser True a la vez.</p><code>while condA and condB:
+    # solo si las dos
+    # son True</code></div>
+        </div></div>
+      </div>
+    </details>
+
+    <div class="split">
+      <div class="split-pane">
+        <div class="step-label"><span class="num">2</span> Tu tarea</div>
+        <div class="consigna">
+          <p class="goal">🎯 Muestra los 9 suministros numerados, igual que los refugios.</p>
+          <ol>
+            <li>Crea la lista <code>suministros_clave</code> <button class="ins" data-snip="m2_lista" data-ta="code2_step1">📋 Insertar lista</button></li>
+            <li>Repite el patrón contador + <strong>for</strong> de la Misión 1.</li>
+          </ol>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">▸ Salida esperada</div>
+          <pre>1. manta
+2. fuego
+3. comida
+…
+9. cobija</pre>
+          <div class="ins-row"><button class="ins" data-snip="m2_print" data-ta="code2_step1">📋 Insertar print</button></div>
+        </div>
+        <details class="hint" data-step="m2s1">
+          <summary>💡 Pista</summary>
+          <p>Es el mismo código de la Misión 1, Paso 1. Solo cambia la lista.</p>
+        </details>
+      </div>
+
+      <div class="split-pane">
+        <div class="step-label"><span class="num">3</span> Programa y ejecuta</div>
+        <div class="ed-bar">
+          <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+          <span class="fname">mision2_paso1.py</span>
+        </div>
+        <textarea id="code2_step1" spellcheck="false"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-red" onclick="runStep1('2')">▶ Ejecutar</button>
+          <button class="btn btn-pdf" onclick="descargarPDF('code2_step1', 'Misión 2 - Paso 1: Lista de Suministros')">📄 PDF</button>
+          <span id="status2_step1" class="status-message"></span>
+        </div>
+        <div class="pane-label">▸ salida</div>
+        <div class="term empty" id="out2_step1">La salida de tu código aparecerá aquí.</div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn btn-ghost" onclick="goTo(2)">← Misión 1</button>
+      <div class="nav-spacer"></div>
+      <button class="btn btn-go" id="next-3" onclick="goTo(4)" disabled>Paso 2 →</button>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 4 — M2 P2 ════════ -->
+  <section class="screen" data-screen="4">
+    <span class="mission-tag">// misión 02 de 04 · paso 2</span>
+    <h2>🎒 Llena la valija</h2>
+    <div class="narrative-grid">
+      <div class="diag">
+        <div class="step-label"><span class="num">1</span> Mira: así da vueltas tu while</div>
+        <div class="flow">
+          <div class="fl-node fl-cond">¿<code>len(inventario_usuario) &lt; 5</code><br><b>and</b> <code>eleccion != "salir"</code>?</div>
+          <div class="fl-branches">
+            <div class="fl-col">
+              <span class="fl-tag ok">True ↓</span>
+              <div class="fl-node">eleccion = input(…)</div>
+              <div class="fl-node">si no es "salir" → append()</div>
+              <span class="fl-loop">↺ vuelve a la pregunta</span>
+            </div>
+            <div class="fl-col">
+              <span class="fl-tag bad">False ↓</span>
+              <div class="fl-node">print(inventario_usuario)</div>
+              <span class="fl-end">fin</span>
+            </div>
+          </div>
+        </div>
+        <div class="valija">
+          <div class="valija-label">🧳 Valija del dron <span id="valija-count-m2">0/5</span></div>
+          <div class="slots" id="slots-m2"></div>
+        </div>
+      </div>
+      <div class="story-box">
+        <div class="story-timestamp">⬤ en vivo · t-26 minutos</div>
+        <p id="m2p2-story1"></p>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="split-pane">
+        <div class="step-label"><span class="num">2</span> Tu tarea</div>
+        <div class="consigna">
+          <p class="goal">🎯 Pide suministros hasta llenar la valija o hasta que escriban «salir».</p>
+          <ol>
+            <li>Crea <code>inventario_usuario = []</code> y <code>eleccion = ""</code>.</li>
+            <li><strong>while</strong>: menos de 5 objetos <strong>and</strong> <code>eleccion</code> distinta de "salir".</li>
+            <li>Adentro: pide con input(). <button class="ins" data-snip="m2_input" data-ta="code2_step2">📋 Insertar input</button><br>Si no es "salir", usa <code>append()</code>.</li>
+            <li>Al terminar el bucle, muestra el inventario.</li>
+          </ol>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">▸ Ejemplo: 3 objetos y «salir»</div>
+          <pre>Tu inventario: ['manta', 'fuego', 'botiquin']</pre>
+          <div class="ins-row"><button class="ins" data-snip="m2_print2" data-ta="code2_step2">📋 Insertar print</button></div>
+        </div>
+        <details class="hint" data-step="m2s2">
+          <summary>💡 Pista</summary>
+          <p>El while revisa la condición <em>antes</em> de cada vuelta. Por eso <code>eleccion</code> tiene que existir (vacía) antes del while.</p>
+        </details>
+      </div>
+
+      <div class="split-pane">
+        <div class="step-label"><span class="num">3</span> Programa y ejecuta</div>
+        <div class="ed-bar">
+          <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+          <span class="fname">mision2_paso2.py</span>
+        </div>
+        <textarea id="code2_step2" spellcheck="false"># La lista "suministros_clave" del Paso 1 ya está en memoria.
+</textarea>
+        <div class="btn-row">
+          <button class="btn btn-red" onclick="runStep2('2')">▶ Ejecutar</button>
+          <button class="btn btn-pdf" onclick="descargarPDF('code2_step2', 'Misión 2 - Paso 2: Carga de Valija')">📄 PDF</button>
+          <span id="status2_step2" class="status-message"></span>
+        </div>
+        <div class="pane-label">▸ salida</div>
+        <div class="term empty" id="out2_step2">La salida de tu código aparecerá aquí.</div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn btn-ghost" onclick="goTo(3)">← Paso 1</button>
+      <div class="nav-spacer"></div>
+      <button class="btn btn-go" id="next-4" onclick="goTo(5)" disabled>Misión 3 →</button>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 5 — M3 ════════ -->
+  <section class="screen" data-screen="5">
+    <span class="mission-tag">// misión 03 de 04</span>
+    <h2>🔍 Verificación crítica</h2>
+    <div class="narrative-grid">
+      <div class="visual-column">
+        <div class="step-label"><span class="num">1</span> Mira</div>
+        <div class="vid"><video id="vid-5" src="assets/v_m3.mp4" poster="assets/esperando_twister.jpg" controls playsinline preload="metadata"></video></div>
+      </div>
+      <div class="diag">
+        <div class="story-box compact">
+          <div class="story-timestamp">⬤ alerta roja · t-18 minutos</div>
+          <p id="m3-story1"></p>
+        </div>
+        <div class="diag-title">🎲 random.choice() sortea entre los 9</div>
+        <div class="ruleta" id="ruleta"></div>
+        <div class="check-row">
+          <code>suministro_requerido</code> <b>in</b> <code>inventario_usuario</code> → <span id="check-res" class="bool">?</span>
+        </div>
+        <div class="slots small" id="slots-m3"></div>
+      </div>
+    </div>
+
+    <details class="cards">
+      <summary>🃏 ¿Necesitas repasar? Abre las tarjetas <small>(3)</small></summary>
+      <div class="fc-row">
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>random.choice()</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Elige un elemento al azar de una lista. Primero importa random.</p><code>import random
+r = random.choice(lista)</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>in (operador)</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Pregunta si un valor está en una lista. Responde True o False.</p><code>"fuego" in lista
+# True si está
+# False si no está</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>Variable booleana</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Guarda el resultado de una condición: True o False.</p><code>es_seguro = "fuego" in mi_lista
+print(es_seguro)</code></div>
+        </div></div>
+      </div>
+    </details>
+
+    <div class="split">
+      <div class="split-pane">
+        <div class="step-label"><span class="num">2</span> Tu tarea</div>
+        <div class="consigna">
+          <p class="goal">🎯 Sortea un suministro y verifica si está en tu valija.</p>
+          <ol>
+            <li>Importa el módulo <code>random</code>.</li>
+            <li>Sortea entre <code>suministros_clave</code> y guárdalo en <code>suministro_requerido</code>.</li>
+            <li>Con <strong>in</strong>, guarda en <code>es_seguro</code> si está en <code>inventario_usuario</code>.</li>
+            <li>Muestra los dos valores.</li>
+          </ol>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">▸ Ejemplo de salida</div>
+          <pre>Suministro requerido: botiquin
+¿Está en tu inventario?: True</pre>
+          <div class="ins-row">
+            <button class="ins" data-snip="m3_print1" data-ta="code3">📋 Insertar print 1</button>
+            <button class="ins" data-snip="m3_print2" data-ta="code3">📋 Insertar print 2</button>
+          </div>
+        </div>
+        <details class="hint" data-step="m3">
+          <summary>💡 Pista</summary>
+          <p>¿Salió False? Vuelve a la Misión 2, cambia tu valija y ejecuta esta misión otra vez.</p>
+        </details>
+      </div>
+
+      <div class="split-pane">
+        <div class="step-label"><span class="num">3</span> Programa y ejecuta</div>
+        <div class="ed-bar">
+          <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+          <span class="fname">mision3.py</span>
+        </div>
+        <textarea id="code3" spellcheck="false"># "suministros_clave" e "inventario_usuario" ya están en memoria.
+</textarea>
+        <div class="btn-row">
+          <button class="btn btn-red" onclick="runMission('3')">▶ Ejecutar</button>
+          <button class="btn btn-pdf" onclick="descargarPDF('code3', 'Misión 3: Verificación Estructural')">📄 PDF</button>
+          <span id="status3" class="status-message"></span>
+        </div>
+        <div class="pane-label">▸ salida</div>
+        <div class="term empty" id="out3">La salida de tu código aparecerá aquí.</div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn btn-ghost" onclick="goTo(4)">← Misión 2</button>
+      <div class="nav-spacer"></div>
+      <button class="btn btn-go" id="next-5" onclick="goTo(6)" disabled>Misión final →</button>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 6 — M4 FINAL ════════ -->
+  <section class="screen" data-screen="6">
+    <span class="mission-tag">// misión 04 de 04 — final</span>
+    <h2>⚡ El momento de la verdad</h2>
+    <div class="narrative-grid">
+      <div class="visual-column">
+        <div class="step-label"><span class="num">1</span> Mira</div>
+        <div class="vid"><video id="vid-6" src="assets/v_m4.mp4" poster="assets/twister_intro.jpg" controls playsinline preload="metadata"></video></div>
+      </div>
+      <div class="diag">
+        <div class="story-box compact">
+          <div class="story-timestamp">⬤ impacto inminente · t-02 minutos</div>
+          <p id="m4-story1"></p>
+        </div>
+        <div class="diag-title">🔀 Tu if / else elige un solo camino</div>
+        <div class="fork">
+          <div class="fork-top">if <b>es_seguro</b>:</div>
+          <div class="fork-lines"><span></span><span></span></div>
+          <div class="fork-row">
+            <div class="fork-b ok" id="fork-true"><b>True</b><span>🏆 Victoria</span></div>
+            <div class="fork-b bad" id="fork-false"><b>False</b> (else)<span>💀 Game over</span></div>
+          </div>
+          <div class="diag-foot" id="fork-val">es_seguro = ?</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="cards">
+      <summary>🃏 ¿Necesitas repasar? Abre las tarjetas <small>(3)</small></summary>
+      <div class="fc-row">
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>IF / ELSE</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Si la condición es True corre un bloque; si no, el otro.</p><code>if condicion:
+    # si True
+else:
+    # si False</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>f-strings</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Meten variables dentro de un texto. La f va antes de las comillas.</p><code>nombre = "Ana"
+print(f"Hola, {nombre}")</code></div>
+        </div></div>
+        <div class="fc" onclick="flipCard(this)"><div class="fc-in">
+          <div class="fc-f"><h4>Booleana en if</h4><small>toca para girar</small><span class="flip-tag">▸ toca</span></div>
+          <div class="fc-b"><p>Una variable True/False ya sirve como condición.</p><code>if es_seguro:
+    print("refugio ok")</code></div>
+        </div></div>
+      </div>
+    </details>
+
+    <div class="split">
+      <div class="split-pane">
+        <div class="step-label"><span class="num">2</span> Tu tarea</div>
+        <div class="consigna">
+          <p class="goal">🎯 Con <strong>if / else</strong>, muestra el mensaje de victoria o el de derrota.</p>
+          <ol>
+            <li><code>if es_seguro:</code> → mensaje de victoria. <button class="ins" data-snip="m4_win" data-ta="code4">📋 Insertar print 🏆</button></li>
+            <li><code>else:</code> → mensaje de derrota. <button class="ins" data-snip="m4_lose" data-ta="code4">📋 Insertar print 💀</button></li>
+            <li>Ojo con la sangría: cada print va 4 espacios adentro.</li>
+          </ol>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">▸ Ejemplo: victoria</div>
+          <pre>🏆 ¡Has sobrevivido al Twister! El refugio resistió. ¡Felicidades, ganaste con el botiquin!</pre>
+        </div>
+        <details class="hint" data-step="m4">
+          <summary>💡 Pista</summary>
+          <p>No hace falta <code>== True</code>: <code>if es_seguro:</code> alcanza. Los mensajes ya traen <code>{suministro_requerido}</code> dentro del f-string.</p>
+        </details>
+      </div>
+
+      <div class="split-pane">
+        <div class="step-label"><span class="num">3</span> Programa y ejecuta</div>
+        <div class="ed-bar">
+          <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+          <span class="fname">mision4_final.py</span>
+        </div>
+        <textarea id="code4" spellcheck="false"># "es_seguro" y "suministro_requerido" ya están en memoria.
+</textarea>
+        <div class="btn-row">
+          <button class="btn btn-red" onclick="runMission('4')">▶ Ejecutar</button>
+          <button class="btn btn-pdf" onclick="descargarPDF('code4', 'Misión 4: Resultado del Twister')">📄 PDF</button>
+          <span id="status4" class="status-message"></span>
+        </div>
+        <div class="pane-label">▸ salida</div>
+        <div class="term empty" id="out4">La salida de tu código aparecerá aquí.</div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn btn-ghost" onclick="goTo(5)">← Misión 3</button>
+      <div class="nav-spacer"></div>
+      <button class="btn btn-go" id="next-6" onclick="goTo(7)" disabled>Ver el desenlace →</button>
+    </div>
+  </section>
+
+  <!-- ════════ PANTALLA 7 — CIERRE ════════ -->
+  <section class="screen" data-screen="7">
+    <span class="mission-tag">// desenlace</span>
+    <div class="ending" id="ending"></div>
+  </section>
+
+  </div>
+</main>
+
+<footer>
+  <p>⚡ Aventura: La Furia del Twister · Ciencias de la Computación · ANEP EBI 2026</p>
+</footer>
+
+<script>
+/* ════════ ESTADO Y CONSTANTES ════════ */
+let pyodideGlobal=null;
+let pyodideReady=false;
+let pyodideReadyPromise=null;
+let playerName = "operador";
+
+const TOTAL_SCREENS = 8; // 0 intro .. 7 cierre
+let currentScreen = 0;
+
+let state = {
+  refugio_usuario:null,
+  inventario_usuario:[],
+  suministros_clave:["manta","fuego","comida","botiquin","kit furioso","linterna","radio","filtro","cobija"],
+  refugios:["Subterráneo","en las Montañas","en el Bosque"],
+  suministro_requerido:null,
+  es_seguro:null
+};
+
+/* progreso por misión/paso */
+const flags = { m1s1:false, m1s2:false, m2s1:false, m2s2:false, m3:false, m4:false };
+
+/* ════════ ANALÍTICAS DE PROCESO (estilo ShanUKI) ════════
+   Por cada paso: intentos (v), fallos (f), ejecuciones/errores técnicos (e),
+   éxito a la primera (ok1), pista mostrada (p), fecha de logro (ts) */
+const PASOS = ['m1s1','m1s2','m2s1','m2s2','m3','m4'];
+const PASO_LABEL = {
+  m1s1:'Misión 1 · Paso 1 — Listar refugios',
+  m1s2:'Misión 1 · Paso 2 — Elegir refugio',
+  m2s1:'Misión 2 · Paso 1 — Listar suministros',
+  m2s2:'Misión 2 · Paso 2 — Cargar la valija',
+  m3:'Misión 3 — Verificación estructural',
+  m4:'Misión Final — Resultado del Twister'
+};
+let stats = {};
+function initStats(){
+  PASOS.forEach(k=>{ if(!stats[k]) stats[k]={v:0,f:0,e:0,ok1:false,p:false,ts:null}; });
+}
+function statOf(k){ if(!stats[k]) stats[k]={v:0,f:0,e:0,ok1:false,p:false,ts:null}; return stats[k]; }
+/* registrar un intento: exito=true/false, tecnico=true si hubo error de ejecución */
+function registrarIntento(k, exito, tecnico){
+  const s = statOf(k);
+  if(flags[k]) return; /* ya resuelto: no altera analíticas */
+  s.v++;
+  if(tecnico) s.e++;
+  if(exito){
+    s.ok1 = (s.f === 0 && s.e === 0 && s.v === 1);
+    s.ts = Date.now();
+  } else {
+    s.f++;
+  }
+  saveAll();
+}
+function registrarPista(k){
+  const s = statOf(k);
+  if(!flags[k] && !s.p){ s.p = true; saveAll(); }
+}
+
+/* ════════ PERSISTENCIA ════════ */
+const LS = {
+  flags:'twz_flags', state:'twz_state', name:'twz_name', theme:'twz_theme', screen:'twz_screen', stats:'twz_stats',
+  code:id=>`twz_code_${id}`
+};
+const CODE_IDS = ['code1_step1','code1_step2','code2_step1','code2_step2','code3','code4'];
+
+function saveAll(){
+  try{
+    localStorage.setItem(LS.flags, JSON.stringify(flags));
+    localStorage.setItem(LS.state, JSON.stringify(state));
+    localStorage.setItem(LS.stats, JSON.stringify(stats));
+    localStorage.setItem(LS.name, playerName);
+    localStorage.setItem(LS.screen, String(currentScreen));
+  }catch(e){}
+}
+function saveCode(id){ try{ localStorage.setItem(LS.code(id), document.getElementById(id).value); }catch(e){} }
+function loadAll(){
+  try{
+    const f=localStorage.getItem(LS.flags); if(f) Object.assign(flags, JSON.parse(f));
+    const s=localStorage.getItem(LS.state); if(s) state={...state, ...JSON.parse(s)};
+    const st=localStorage.getItem(LS.stats); if(st) stats={...stats, ...JSON.parse(st)};
+    initStats();
+    const n=localStorage.getItem(LS.name); if(n) playerName=n;
+    if(localStorage.getItem(LS.theme)==='light') applyTheme(true);
+    CODE_IDS.forEach(id=>{
+      const c=localStorage.getItem(LS.code(id)); const el=document.getElementById(id);
+      if(c!==null && el) el.value=c;
+      if(el) el.addEventListener('input', ()=>saveCode(id));
+    });
+    const sc=parseInt(localStorage.getItem(LS.screen)||'0',10);
+    currentScreen = isNaN(sc)?0:Math.min(Math.max(sc,0),7);
+  }catch(e){}
+}
+
+/* ════════ TEMA ════════ */
+function applyTheme(light){
+  document.body.classList.toggle('light', light);
+  document.getElementById('themeBtn').textContent = light ? '🌙 Modo oscuro' : '☀️ Modo claro';
+}
+function toggleTheme(){
+  const light=!document.body.classList.contains('light');
+  applyTheme(light);
+  try{ localStorage.setItem(LS.theme, light?'light':'dark'); }catch(e){}
+}
+
+/* ════════ NARRATIVA PERSONALIZADA ════════ */
+function fillNarrative(){
+  const N = escapeHTML(playerName);
+  const set=(id,html)=>{ const el=document.getElementById(id); if(el) el.innerHTML=html; };
+  set('m1p1-story1', `<strong>${N}</strong>, el sistema encontró <strong>3 refugios</strong>. Muéstralos numerados para que el equipo pueda elegir.`);
+  set('m1p2-story1', `Bien, <strong>${N}</strong>. La lista ya está en pantalla. Ahora la persona de turno elige un número y tu programa tiene que saber qué refugio es.`);
+  set('m2p1-story1', `<strong>${N}</strong>, hay <strong>9 suministros</strong> en la zona. El dron carga solo <strong>5</strong>, y uno de ellos te va a salvar.`);
+  set('m2p2-story1', `El dron espera, <strong>${N}</strong>. La carga termina con <strong>5 objetos</strong> o cuando alguien escribe <strong>«salir»</strong>.`);
+  set('m3-story1', `¡Las paredes tiemblan, <strong>${N}</strong>! El refugio necesita un suministro elegido al azar. ¿Lo tienes en la valija?`);
+  set('m4-story1', `Impacto en <strong>120 segundos</strong>, <strong>${N}</strong>. Tu if / else decide el final.`);
+}
+function escapeHTML(t){ return String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ════════ NAVEGACIÓN ════════ */
+function buildDots(){
+  const cont=document.getElementById('dots');
+  cont.innerHTML='';
+  for(let i=0;i<TOTAL_SCREENS;i++){
+    const d=document.createElement('div'); d.className='sdot'; d.id='sdot-'+i;
+    cont.appendChild(d);
+  }
+}
+function refreshDots(){
+  for(let i=0;i<TOTAL_SCREENS;i++){
+    const d=document.getElementById('sdot-'+i); if(!d) continue;
+    d.classList.toggle('current', i===currentScreen);
+    d.classList.toggle('done', i<currentScreen);
+  }
+}
+function goTo(s){
+  currentScreen=s;
+  document.querySelectorAll('.screen').forEach(el=>{
+    el.classList.toggle('active', parseInt(el.dataset.screen,10)===s);
+  });
+  refreshDots(); saveAll();
+  window.scrollTo({top:0, behavior:'smooth'});
+  /* videos: pausar los demás; reproducir el de esta pantalla si el sonido está activo */
+  document.querySelectorAll('video').forEach(v=>{ if(!v.closest('.screen.active')) v.pause(); });
+  const vid = document.querySelector('.screen.active video');
+  if(vid && SFX.on && autoVideo){ vid.currentTime=0; vid.play().catch(()=>{}); }
+  autoVideo = true;
+  SFX.whoosh();
+  refreshVisuals();
+  if(s===7) renderEnding();
+}
+let autoVideo = false; /* no reproducir solo al cargar la página (sin gesto del usuario) */
+
+/* ════════ SONIDO (Web Audio, sin archivos) ════════ */
+const SFX = {
+  on:false, ctx:null, amb:null,
+  init(){
+    if(this.ctx) return this.ctx;
+    try{ this.ctx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ this.ctx=null; }
+    return this.ctx;
+  },
+  tone(freq, dur, type='sine', vol=.18, when=0, slideTo=null){
+    if(!this.on || !this.init()) return;
+    const c=this.ctx, t=c.currentTime+when, o=c.createOscillator(), g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,t);
+    if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo,t+dur);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.015);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+.05);
+  },
+  noise(dur, freq=800, vol=.3, when=0, q=.8){
+    if(!this.on || !this.init()) return;
+    const c=this.ctx, t=c.currentTime+when, n=Math.floor(c.sampleRate*dur);
+    const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+    const src=c.createBufferSource(); src.buffer=buf;
+    const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=freq; f.Q.value=q;
+    const g=c.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    src.connect(f).connect(g).connect(c.destination); src.start(t);
+  },
+  click(){ this.tone(1200,.05,'square',.05); },
+  flip(){ this.noise(.12,3000,.08); },
+  insert(){ this.tone(880,.06,'triangle',.12); this.tone(1320,.08,'triangle',.1,.05); },
+  whoosh(){ this.noise(.45,1400,.12); },
+  ok(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.18,'triangle',.16,i*.09)); },
+  fail(){ this.tone(220,.22,'sawtooth',.1); this.tone(160,.3,'sawtooth',.1,.18); },
+  alarm(){ for(let i=0;i<3;i++){ this.tone(880,.18,'square',.06,i*.4); this.tone(660,.18,'square',.06,i*.4+.2); } },
+  tick(){ this.tone(1500,.03,'square',.05); },
+  thunder(){ this.noise(1.8,220,.6); this.noise(.25,2500,.25); },
+  win(){ [523,659,784,659,784,1047].forEach((f,i)=>this.tone(f,.28,'triangle',.18,i*.14)); },
+  lose(){ [392,330,262,196].forEach((f,i)=>this.tone(f,.4,'sawtooth',.09,i*.3)); this.thunder(); },
+  ambient(play){
+    if(!this.init()) return;
+    if(play && !this.amb){
+      const c=this.ctx, n=c.sampleRate*4, buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+      let last=0; for(let i=0;i<n;i++){ last=(last+.02*(Math.random()*2-1))/1.02; d[i]=last*3.2; }
+      const src=c.createBufferSource(); src.buffer=buf; src.loop=true;
+      const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=420;
+      const lfo=c.createOscillator(), lg=c.createGain(); lfo.frequency.value=.12; lg.gain.value=180;
+      lfo.connect(lg).connect(f.frequency); lfo.start();
+      const g=c.createGain(); g.gain.value=.22;
+      src.connect(f).connect(g).connect(c.destination); src.start();
+      this.amb={src,g,lfo};
+    } else if(!play && this.amb){
+      try{ this.amb.src.stop(); this.amb.lfo.stop(); }catch(e){}
+      this.amb=null;
+    }
+  }
+};
+function toggleSound(){
+  SFX.on = !SFX.on;
+  if(SFX.on){ SFX.init(); if(SFX.ctx && SFX.ctx.state==='suspended') SFX.ctx.resume(); SFX.click(); }
+  SFX.ambient(SFX.on && !anyVideoPlaying());
+  document.querySelectorAll('video').forEach(v=>v.muted=!SFX.on);
+  paintSoundBtn();
+  try{ localStorage.setItem('twz_sound', SFX.on?'1':'0'); }catch(e){}
+}
+function paintSoundBtn(){
+  const b=document.getElementById('sndBtn'); if(!b) return;
+  b.textContent = SFX.on ? '🔊 Sonido' : '🔇 Sonido';
+  b.classList.toggle('off', !SFX.on);
+}
+function anyVideoPlaying(){ return [...document.querySelectorAll('video')].some(v=>!v.paused && !v.ended); }
+function wireVideos(){
+  document.querySelectorAll('video').forEach(v=>{
+    v.muted = !SFX.on;
+    v.addEventListener('play', ()=>SFX.ambient(false));
+    v.addEventListener('pause', ()=>SFX.ambient(SFX.on && !anyVideoPlaying()));
+    v.addEventListener('ended', ()=>SFX.ambient(SFX.on && !anyVideoPlaying()));
+    /* si el estudiante toca play con el sonido apagado, se lo activamos */
+    v.addEventListener('volumechange', ()=>{ if(!v.muted && !SFX.on){ toggleSound(); } });
+  });
+}
+
+/* ════════ TARJETAS Y PISTAS ════════ */
+function flipCard(el){ el.classList.toggle('flipped'); SFX.flip(); }
+function wireHints(){
+  document.querySelectorAll('details.hint').forEach(d=>{
+    d.addEventListener('toggle', ()=>{ if(d.open){ registrarPista(d.dataset.step); SFX.click(); } });
+  });
+}
+
+/* ════════ INSERTAR TEXTO EXACTO EN EL EDITOR ════════
+   Inserta en la posición del cursor y respeta la sangría de la línea actual. */
+const SNIPPETS = {
+  m1_lista:  'refugios = ["Subterráneo", "en las Montañas", "en el Bosque"]',
+  m1_print:  'print(f"{contador}. {refugio}")',
+  m1_input:  'int(input("Elige tu refugio (1, 2 o 3): "))',
+  m1_print2: 'print("Has elegido:", refugio_usuario)',
+  m2_lista:  'suministros_clave = ["manta", "fuego", "comida", "botiquin", "kit furioso", "linterna", "radio", "filtro", "cobija"]',
+  m2_print:  'print(f"{contador}. {suministro}")',
+  m2_input:  'input("¿Qué suministro agregas? (o \'salir\'): ")',
+  m2_print2: 'print("Tu inventario:", inventario_usuario)',
+  m3_print1: 'print("Suministro requerido:", suministro_requerido)',
+  m3_print2: 'print("¿Está en tu inventario?:", es_seguro)',
+  m4_win:    'print(f"🏆 ¡Has sobrevivido al Twister! El refugio resistió. ¡Felicidades, ganaste con el {suministro_requerido}!")',
+  m4_lose:   'print(f"💀 El refugio no resistió el Twister. Te faltó el {suministro_requerido}. Game Over, camarada.")'
+};
+function insertSnippet(btn){
+  const ta=document.getElementById(btn.dataset.ta), txt=SNIPPETS[btn.dataset.snip];
+  if(!ta || !txt) return;
+  let start = ta.selectionStart, end = ta.selectionEnd;
+  /* si el editor nunca tuvo foco, insertar al final en una línea nueva */
+  if(document.activeElement!==ta && ta.dataset.touched!=='1'){
+    start = end = ta.value.length;
+    if(ta.value.length && !ta.value.endsWith('\n')){ ta.value += '\n'; start = end = ta.value.length; }
+  }
+  ta.value = ta.value.slice(0,start) + txt + ta.value.slice(end);
+  const pos = start + txt.length;
+  ta.focus(); ta.selectionStart = ta.selectionEnd = pos;
+  ta.dataset.touched='1';
+  ta.dispatchEvent(new Event('input'));
+  ta.classList.remove('flash'); void ta.offsetWidth; ta.classList.add('flash');
+  btn.classList.add('done'); setTimeout(()=>btn.classList.remove('done'), 900);
+  SFX.insert();
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('.ins'); if(b){ e.preventDefault(); insertSnippet(b); }
+});
+document.addEventListener('focusin', e=>{ if(e.target.tagName==='TEXTAREA') e.target.dataset.touched='1'; });
+
+/* ════════ GRÁFICOS QUE REACCIONAN AL CÓDIGO ════════ */
+const ICONOS = { manta:'🛏️', fuego:'🔥', comida:'🥫', botiquin:'⛑️', 'kit furioso':'🧰', linterna:'🔦', radio:'📻', filtro:'🚰', cobija:'🧶' };
+const icono = n => ICONOS[String(n).toLowerCase().trim()] || '📦';
+function supplyHTML(n){ return `<div class="supply" data-n="${escapeHTML(n)}"><span class="ic">${icono(n)}</span>${escapeHTML(n)}</div>`; }
+function renderSupplies(){
+  const g=document.getElementById('supply-grid-m2'); if(g) g.innerHTML = state.suministros_clave.map(supplyHTML).join('');
+  const r=document.getElementById('ruleta'); if(r) r.innerHTML = state.suministros_clave.map(supplyHTML).join('');
+}
+function renderSlots(id, matchName){
+  const el=document.getElementById(id); if(!el) return;
+  const inv = Array.isArray(state.inventario_usuario) ? state.inventario_usuario : [];
+  let h='';
+  for(let i=0;i<5;i++){
+    const it = inv[i];
+    if(it!==undefined){
+      const m = matchName && String(it).toLowerCase().trim()===String(matchName).toLowerCase().trim();
+      h += `<div class="slot full${m?' match':''}"><span class="ic">${icono(it)}</span>${escapeHTML(it)}</div>`;
+    } else h += `<div class="slot">vacío</div>`;
+  }
+  el.innerHTML = h;
+  const cnt=document.getElementById('valija-count-m2'); if(cnt && id==='slots-m2') cnt.textContent = `${Math.min(inv.length,5)}/5`;
+}
+function renderIdx(){
+  const i = state.refugios.indexOf(state.refugio_usuario);
+  document.querySelectorAll('#diag-idx .idx-col').forEach(c=>c.classList.toggle('hit', parseInt(c.dataset.i,10)===i));
+  const f=document.getElementById('idx-result');
+  if(f){
+    if(i>=0){ f.textContent = `Eligieron ${i+1} → refugios[${i}] → ${state.refugio_usuario}`; f.classList.add('hit'); }
+    else { f.textContent = 'Ejecuta tu código: el refugio elegido se va a iluminar.'; f.classList.remove('hit'); }
+  }
+}
+function renderCheck(){
+  const req = state.suministro_requerido;
+  document.querySelectorAll('#ruleta .supply').forEach(s=>s.classList.toggle('pick', !!req && s.dataset.n===req));
+  const b=document.getElementById('check-res');
+  if(b){
+    b.className='bool'+(state.es_seguro===true?' t':state.es_seguro===false?' f':'');
+    b.textContent = state.es_seguro===true?'True':state.es_seguro===false?'False':'?';
+  }
+  renderSlots('slots-m3', req);
+}
+function animateRuleta(done){
+  const items=[...document.querySelectorAll('#ruleta .supply')];
+  const req=state.suministro_requerido;
+  const target=items.findIndex(s=>s.dataset.n===req);
+  if(!items.length || target<0){ renderCheck(); done&&done(); return; }
+  items.forEach(s=>s.classList.remove('pick','spin'));
+  const b=document.getElementById('check-res'); if(b){ b.className='bool'; b.textContent='…'; }
+  const steps = items.length*2 + target; let k=0;
+  const tick=()=>{
+    items.forEach(s=>s.classList.remove('spin'));
+    items[k%items.length].classList.add('spin'); SFX.tick();
+    k++;
+    if(k<=steps){ setTimeout(tick, 45 + k*k*0.35); }
+    else { items.forEach(s=>s.classList.remove('spin')); renderCheck(); done&&done(); }
+  };
+  tick();
+}
+function renderFork(){
+  const t=document.getElementById('fork-true'), f=document.getElementById('fork-false'), v=document.getElementById('fork-val');
+  if(!t) return;
+  const val=state.es_seguro;
+  t.classList.toggle('on', val===true);  t.classList.toggle('dim', val===false);
+  f.classList.toggle('on', val===false); f.classList.toggle('dim', val===true);
+  if(v) v.textContent = 'es_seguro = ' + (val===true?'True':val===false?'False':'?') + (state.suministro_requerido?` · suministro: ${state.suministro_requerido}`:'');
+}
+function refreshVisuals(){ renderIdx(); renderSlots('slots-m2'); renderCheck(); renderFork(); }
+function startMission(){
+  const val=document.getElementById('playerName').value.trim();
+  playerName = val || "operador";
+  fillNarrative();
+  saveAll();
+  SFX.alarm();
+  goTo(1);
+}
+
+/* ════════ PYODIDE ════════ */
+function overrideInput(py){
+  py.globals.set("js_prompt",(msg="")=>{ try{const v=prompt(msg||"Escribe un valor:"); return v===null?"":v;}catch(e){return "";} });
+  py.runPython(`
+import builtins, time, sys
+def _safe_input(msg=""):
+    global _t_start
+    current_trace = sys.gettrace()
+    sys.settrace(None)
+    a = time.time()
+    r = js_prompt(msg)
+    try:
+        global _t_start
+        _t_start += (time.time() - a)
+    except NameError:
+        pass
+    if current_trace:
+        sys.settrace(current_trace)
+    return r
+try: builtins.input = _safe_input
+except Exception: pass
+`);
+}
+function inject(py){
+  py.globals.set("refugios",py.toPy(state.refugios));
+  py.globals.set("suministros_clave",py.toPy(state.suministros_clave));
+  py.globals.set("inventario_usuario",py.toPy(state.inventario_usuario));
+  if(state.refugio_usuario) py.globals.set("refugio_usuario",state.refugio_usuario);
+  if(state.suministro_requerido) py.globals.set("suministro_requerido",state.suministro_requerido);
+  if(state.es_seguro!==null) py.globals.set("es_seguro",state.es_seguro);
+}
+function extract(py){
+  try{ state.refugio_usuario = py.globals.get("refugio_usuario")||state.refugio_usuario; }catch(e){}
+  try{ const inv=py.globals.get("inventario_usuario"); if(inv&&inv.toJs) state.inventario_usuario=Array.from(inv.toJs()); }catch(e){}
+  try{ const sr=py.globals.get("suministro_requerido"); if(sr!=null) state.suministro_requerido=sr; }catch(e){}
+  try{ const es=py.globals.get("es_seguro"); if(es===true||es===false) state.es_seguro=es; }catch(e){}
+}
+
+async function exec(code, stepHint=""){
+  if(!pyodideReady || !pyodideGlobal){
+    throw new Error("El motor de Python todavía se está cargando o no pudo cargarse. Espera unos segundos a que aparezca \"Python listo\" abajo, o recarga la página si el aviso indica un error de conexión.");
+  }
+  const py=pyodideGlobal;
+  overrideInput(py); inject(py);
+  await py.runPythonAsync(`
+import sys, io, time, random
+def _t_trace(frame, event, arg):
+    if time.time() - _t_start > 2.5:
+        sys.settrace(None); raise Exception("BUCLE_INFINITO")
+    return _t_trace
+sys.stdout = io.StringIO()
+_t_start = time.time()
+sys.settrace(_t_trace)
+`);
+  let salida="";
+  try{
+    await py.runPythonAsync(code);
+  }catch(err){
+    if((err.message||'').includes("BUCLE_INFINITO")){
+      let msg = "⏳ BUCLE INFINITO DETECTADO:\nLa ejecución se detuvo para que la página no se cuelgue.\n";
+      if(stepHint){
+        msg += stepHint;
+      } else {
+        msg += "Revisa las condiciones de tus bucles 'while' o 'for' para asegurar que puedan terminar.";
+      }
+      throw new Error(msg);
+    }
+    throw err;
+  }finally{
+    salida = py.runPython("sys.settrace(None)\nsys.stdout.getvalue()");
+  }
+  extract(py); saveAll();
+  return salida||"";
+}
+
+/* ════════ HELPERS UI ════════ */
+function setStatus(id,cls,msg){ const el=document.getElementById(id); el.className='status-message '+cls; el.textContent=msg; }
+function setTerm(id,text){ const el=document.getElementById(id); el.classList.remove('empty'); el.textContent=text; }
+function unlockNext(screen){ const b=document.getElementById('next-'+screen); if(b) b.disabled=false; }
+
+/* ════════ AYUDA POR PALABRA CLAVE DEL ERROR ════════
+   Traduce los errores técnicos de Python a una pista clara en español. */
+const AYUDA_ERRORES = [
+  { clave:'IndentationError',        ayuda:'⚠️ Error de sangría (indentación). En Python, lo que va dentro de un if, for, while o def debe estar corrido 4 espacios hacia adentro. Revisa que todas las líneas del bloque tengan la misma sangría.' },
+  { clave:'expected an indented block', ayuda:'⚠️ Falta sangría después de los dos puntos ":". La línea siguiente a un if, for, while o def debe empezar con 4 espacios.' },
+  { clave:'unexpected indent',        ayuda:'⚠️ Hay una sangría de más. Una línea tiene espacios al inicio que Python no esperaba. Alinéala con las demás.' },
+  { clave:'SyntaxError',              ayuda:'⚠️ Error de sintaxis. Revisa que no falten los dos puntos ":" al final de un if/for/while, ni paréntesis o comillas sin cerrar.' },
+  { clave:'invalid syntax',           ayuda:'⚠️ Sintaxis inválida. Suele faltar un ":" al final de la línea, una comilla o un paréntesis de cierre.' },
+  { clave:'NameError',                ayuda:'⚠️ Nombre no definido. Estás usando una variable que todavía no creaste, o la escribiste distinto (Python distingue mayúsculas de minúsculas).' },
+  { clave:'is not defined',           ayuda:'⚠️ Esa variable o función no existe todavía. Verifica que la hayas creado antes y que el nombre esté escrito exactamente igual.' },
+  { clave:'TypeError',                ayuda:'⚠️ Estás mezclando tipos de datos incompatibles (por ejemplo, sumar un número con un texto). Convierte con int(), str() o float() según necesites.' },
+  { clave:'ValueError',               ayuda:'⚠️ El valor no es válido para esa operación (por ejemplo, convertir a int() un texto que no es número).' },
+  { clave:'IndexError',               ayuda:'⚠️ Estás pidiendo una posición de la lista que no existe. Recuerda que la primera posición es 0.' },
+  { clave:'KeyError',                 ayuda:'⚠️ Esa clave no existe en el diccionario. Revisa el nombre exacto de la clave.' },
+  { clave:'ModuleNotFoundError',      ayuda:'⚠️ No se encontró el módulo. Verifica el nombre en tu import (por ejemplo, import random).' },
+  { clave:'ZeroDivisionError',        ayuda:'⚠️ No se puede dividir entre cero. Revisa el divisor de tu operación.' },
+  { clave:'EOL while scanning',       ayuda:'⚠️ Quedó una comilla sin cerrar. Cada texto debe abrir y cerrar con el mismo tipo de comilla.' },
+  { clave:'unexpected EOF',           ayuda:'⚠️ El código terminó antes de lo esperado: quedó un paréntesis, corchete o bloque sin cerrar.' },
+];
+function ayudaDeError(mensaje){
+  const m = String(mensaje||'');
+  for(const it of AYUDA_ERRORES){ if(m.includes(it.clave)) return it.ayuda; }
+  return '';
+}
+function mostrarError(outId, err, stId, statusMsg){
+  const raw = (err && err.message) ? err.message : String(err);
+  const pista = ayudaDeError(raw);
+  const texto = '❌ Error:\n' + raw + (pista ? '\n\n💡 ' + pista : '');
+  setTerm(outId, texto);
+  setStatus(stId, 'status-fail', statusMsg);
+  SFX.fail();
+}
+
+/* ════════ PASO 1 (M1 y M2) ════════ */
+async function runStep1(id){
+  const code=document.getElementById(`code${id}_step1`).value.trim();
+  const outId=`out${id}_step1`, stId=`status${id}_step1`;
+  if(!code){ setTerm(outId,'⚠️ El editor está vacío. Escribe tu código primero.'); setStatus(stId,'status-warn','Nada que ejecutar.'); return; }
+  setTerm(outId,'⏳ Ejecutando...');
+  try{
+    const hint = id === '1' ? "Revisa tu bucle al listar los refugios." : "Revisa tu bucle al listar los suministros clave.";
+    const stdout=await exec(code, hint);
+    setTerm(outId, stdout.trim()||'⚠️ Sin salida. ¿Usaste print()?');
+    let ok=false;
+    if(id==='1'){ const c=stdout.toLowerCase(); ok=state.refugios.every(r=>c.includes(r.toLowerCase())); }
+    else if(id==='2'){ const c=stdout.toLowerCase(); ok=state.suministros_clave.every(s=>c.includes(s.toLowerCase())); }
+    if(ok){
+      setStatus(stId,'status-pass',`✅ ¡Validado, ${playerName}! Ya puedes avanzar.`); SFX.ok();
+      registrarIntento(id==='1'?'m1s1':'m2s1', true, false);
+      if(id==='1'){ flags.m1s1=true; unlockNext(1); } else { flags.m2s1=true; unlockNext(3); }
+    }else{
+      registrarIntento(id==='1'?'m1s1':'m2s1', false, false);
+      setStatus(stId,'status-fail','❌ Salida incorrecta. Revisa que aparezcan todos los elementos, bien escritos.'); SFX.fail();
+    }
+  }catch(err){
+    registrarIntento(id==='1'?'m1s1':'m2s1', false, true);
+    mostrarError(outId, err, stId, 'Error en el código. Revisa la sintaxis. ❌');
+  }
+  saveAll();
+}
+
+/* ════════ PASO 2 (M1 y M2) ════════ */
+async function runStep2(id){
+  const code=document.getElementById(`code${id}_step2`).value.trim();
+  const outId=`out${id}_step2`, stId=`status${id}_step2`;
+  if(!code){ setTerm(outId,'⚠️ El editor está vacío. Escribe tu código primero.'); setStatus(stId,'status-warn','Nada que ejecutar.'); return; }
+  setTerm(outId,'⏳ Ejecutando (puede abrirse un diálogo de entrada)...');
+  try{
+    const hint = id === '1' 
+      ? "Revisa tu código: en este paso no necesitas un bucle 'while', solo leer la entrada con input()." 
+      : "Revisa tu bucle 'while': la condición tiene que poder volverse falsa (5 elementos o 'salir') y el input() va dentro del bucle.";
+    const stdout=await exec(code, hint);
+    setTerm(outId, stdout.trim()||'⚠️ Sin salida. ¿Usaste print()?');
+    let ok=false;
+    if(id==='1'){ ok = state.refugio_usuario!==null && state.refugios.includes(state.refugio_usuario); }
+    else if(id==='2'){ ok = Array.isArray(state.inventario_usuario) && state.inventario_usuario.length>=1 && state.inventario_usuario.length<=5; }
+    refreshVisuals();
+    if(ok){
+      setStatus(stId,'status-pass',`✅ ¡Misión completada, ${playerName}!`); SFX.ok();
+      registrarIntento(id==='1'?'m1s2':'m2s2', true, false);
+      if(id==='1'){ flags.m1s2=true; unlockNext(2); } else { flags.m2s2=true; unlockNext(4); }
+    }else{
+      registrarIntento(id==='1'?'m1s2':'m2s2', false, false); SFX.fail();
+      if(id==='1'){
+        setStatus(stId,'status-fail',`⏳ ¡El tiempo se acaba, ${playerName}! Elige un refugio válido (1, 2 o 3) y guárdalo en refugio_usuario… ¡YA!`);
+      }else{
+        setStatus(stId,'status-fail',`⏳ El dron se queda sin ventana, ${playerName}. La valija debe tener entre 1 y 5 elementos. Revisa el while y vuelve a ejecutar… ¡rápido!`);
+      }
+    }
+  }catch(err){
+    registrarIntento(id==='1'?'m1s2':'m2s2', false, true);
+    mostrarError(outId, err, stId, 'Error en la ejecución. ❌');
+  }
+  saveAll();
+}
+
+/* ════════ MISIONES 3 y 4 ════════ */
+async function runMission(id){
+  const code=document.getElementById(`code${id}`).value.trim();
+  const outId=`out${id}`, stId=`status${id}`;
+  if(!code){ setTerm(outId,'⚠️ El editor está vacío. Escribe tu código primero.'); setStatus(stId,'status-warn','Nada que ejecutar.'); return; }
+  setTerm(outId,'⏳ Ejecutando...');
+  try{
+    const hint = id === '3' ? "Revisa las condiciones lógicas de verificación estructural." : "Revisa las condiciones del mensaje final.";
+    const stdout=await exec(code, hint);
+    setTerm(outId, stdout.trim()||'⚠️ Sin salida. ¿Usaste print()?');
+    let ok=false;
+    if(id==='3'){ ok = typeof state.es_seguro==='boolean' && state.suministro_requerido!=null; }
+    else if(id==='4'){
+      const txt=stdout.toLowerCase();
+      if(typeof state.es_seguro==='boolean' && state.suministro_requerido){
+        const req=state.suministro_requerido.toLowerCase();
+        ok = state.es_seguro ? (txt.includes("sobrevivido")&&txt.includes(req)) : (txt.includes("no resistió")&&txt.includes(req));
+      }
+    }
+    const pasar = ()=>{
+      refreshVisuals();
+      if(ok){
+        setStatus(stId,'status-pass',`✅ ¡Misión completada, ${playerName}!`);
+        if(id==='4'){ state.es_seguro ? SFX.win() : SFX.lose(); } else SFX.ok();
+      } else SFX.fail();
+    };
+    if(id==='3' && state.suministro_requerido){ setStatus(stId,'status-warn','🎲 Sorteando…'); animateRuleta(pasar); } else pasar();
+    if(ok){
+      registrarIntento(id==='3'?'m3':'m4', true, false);
+      if(id==='3'){ flags.m3=true; unlockNext(5); } else { flags.m4=true; unlockNext(6); }
+    }else{
+      registrarIntento(id==='3'?'m3':'m4', false, false);
+      let msg='❌ Revisa tu código.';
+      if(id==='3') msg=`❌ ${playerName}, usa random.choice() para suministro_requerido y el operador in para es_seguro.`;
+      if(id==='4') msg='❌ El mensaje no coincide. Usa los botones 📋 para insertar los mensajes exactos.';
+      setStatus(stId,'status-fail',msg);
+    }
+  }catch(err){
+    registrarIntento(id==='3'?'m3':'m4', false, true);
+    mostrarError(outId, err, stId, 'Error en la ejecución. ❌');
+  }
+  saveAll();
+}
+
+/* ════════ CIERRE ════════ */
+function renderEnding(){
+  const el=document.getElementById('ending');
+  const todas = flags.m1s2 && flags.m2s2 && flags.m3 && flags.m4;
+  const recap = `
+    <div class="recap">
+      <div class="recap-row"><span class="m">Misión 1 — Búsqueda de Refugio</span><span>${flags.m1s2?'✅':'⏳'}</span></div>
+      <div class="recap-row"><span class="m">Misión 2 — Recolección Frenética</span><span>${flags.m2s2?'✅':'⏳'}</span></div>
+      <div class="recap-row"><span class="m">Misión 3 — Verificación Crítica</span><span>${flags.m3?'✅':'⏳'}</span></div>
+      <div class="recap-row"><span class="m">Misión 4 — Momento de la Verdad</span><span>${flags.m4?'✅':'⏳'}</span></div>
+    </div>`;
+
+  if(todas && state.es_seguro===true){
+    el.innerHTML = `
+      <img class="ending-visual" src="assets/finalGano.jpg" alt="Sobreviviente enfrentando al Twister"/>
+      <div class="big">🏆</div>
+      <div class="verdict status-pass">¡SOBREVIVISTE AL TWISTER, ${playerName.toUpperCase()}!</div>
+      <p class="detail">Completaste las cuatro misiones y el refugio resistió. Tu código decidió bien y a tiempo.</p>
+      <div class="keyword">SOBREVIVIENTE</div>
+      ${recap}
+      <div class="ending-actions">
+        <button class="btn btn-report" onclick="descargarReporteDesempeno()">📊 Reporte de desempeño (nota CREA)</button>
+        <button class="btn btn-pdf" onclick="descargarPDF()">📄 Descargar mis respuestas (PDF)</button>
+        <button class="btn btn-ghost" onclick="resetAll()">↺ Reiniciar operación</button>
+      </div>`;
+  } else if(todas && state.es_seguro===false){
+    el.innerHTML = `
+      <img class="ending-visual lose" src="assets/esperando_twister.jpg" alt="Refugio destruido por el Twister"/>
+      <div class="big">💀</div>
+      <div class="verdict status-fail">EL REFUGIO NO RESISTIÓ</div>
+      <p class="detail">Tu código funciona, ${playerName}, pero en la valija faltó <strong>${escapeHTML(state.suministro_requerido||'')}</strong>. Vuelve a la Misión 2, cambia tu elección y ejecuta otra vez la 3 y la 4.</p>
+      ${recap}
+      <div class="ending-actions">
+        <button class="btn btn-go" onclick="goTo(3)">← Volver a la Misión 2</button>
+        <button class="btn btn-report" onclick="descargarReporteDesempeno()">📊 Reporte de desempeño (nota CREA)</button>
+        <button class="btn btn-pdf" onclick="descargarPDF()">📄 Descargar mis respuestas (PDF)</button>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="big">⏳</div>
+      <div class="verdict status-warn">OPERACIÓN INCOMPLETA</div>
+      <p class="detail">Faltan misiones por validar, ${playerName}. Completa los pasos pendientes para conocer tu destino.</p>
+      ${recap}
+      <div class="ending-actions">
+        <button class="btn btn-go" onclick="goTo(1)">← Retomar misiones</button>
+        <button class="btn btn-report" onclick="descargarReporteDesempeno()">📊 Reporte de desempeño (nota CREA)</button>
+      </div>`;
+  }
+  /* efectos del desenlace */
+  if(todas){
+    if(state.es_seguro===true){ SFX.win(); }
+    else { SFX.lose(); const fb=document.createElement('div'); fb.className='flashbang'; document.body.appendChild(fb); setTimeout(()=>fb.remove(),800);
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+  }
+}
+
+/* ════════ PDF DINÁMICO (INDIVIDUAL O COMPLETO) ════════ */
+function descargarPDF(onlyId = null, customTitle = ""){
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF();
+  
+  doc.setFont("helvetica","bold"); doc.setFontSize(18);
+  if(onlyId && customTitle){
+    doc.text(`Reporte de Misión: ${customTitle}`, 20, 20);
+  } else {
+    doc.text("Reporte de Supervivencia: Código Python", 20, 20);
+  }
+  
+  doc.setFontSize(10); doc.setFont("helvetica","normal");
+  doc.text(`Operación Twister - Operador: ${playerName}`, 20, 28);
+  let y=40;
+  
+  let misiones=[
+    {title:"Misión 1 - Paso 1: Refugios", id:"code1_step1"},
+    {title:"Misión 1 - Paso 2: Elección", id:"code1_step2"},
+    {title:"Misión 2 - Paso 1: Suministros", id:"code2_step1"},
+    {title:"Misión 2 - Paso 2: Inventario", id:"code2_step2"},
+    {title:"Misión 3: Verificación", id:"code3"},
+    {title:"Misión 4: Resultado", id:"code4"}
+  ];
+  
+  // Si se le pasa un ID de editor, filtramos el array para que solo exporte ese paso
+  if(onlyId){
+    misiones = misiones.filter(item => item.id === onlyId);
+  }
+  
+  misiones.forEach(item=>{
+    const ta=document.getElementById(item.id); const txt=ta?ta.value.trim():"# Sin código registrado";
+    doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text(item.title,20,y); y+=8;
+    doc.setFont("courier","normal"); doc.setFontSize(10);
+    const lines=doc.splitTextToSize(txt,170);
+    doc.setFillColor(245,245,245); doc.rect(18,y-4,174,(lines.length*5)+6,'F');
+    doc.text(lines,20,y); y+=(lines.length*5)+12;
+    if(y>270){ doc.addPage(); y=20; }
+  });
+  
+  // Nombre del archivo según el tipo de descarga
+  const nombreArchivo = onlyId ? `twister_solucion_${onlyId}.pdf` : "twister_respuestas_completo.pdf";
+  doc.save(nombreArchivo);
+}
+
+/* ════════ REPORTE DE DESEMPEÑO GENERAL (nota para libreta CREA) ════════ */
+function calcularDesempeno(){
+  initStats();
+  const codeDe = {
+    m1s1:'code1_step1', m1s2:'code1_step2', m2s1:'code2_step1',
+    m2s2:'code2_step2', m3:'code3', m4:'code4'
+  };
+  let resueltos=0, primera=0, totIntentos=0, totErrores=0, aura=0, racha=0, rachaMax=0;
+  let puntajeMisiones=0, misionesPenalizadas=0;
+  const filas = PASOS.map(k=>{
+    const s = statOf(k);
+    const ok = !!flags[k];
+    let puntoMision = 0, penalizada = false;
+    if(ok){
+      resueltos++;
+      totIntentos += Math.max(s.v,1);
+      totErrores += s.e;
+      if(s.ok1){ primera++; racha++; rachaMax=Math.max(rachaMax,racha); aura+=3; if(racha>=2) aura+=2; }
+      else { racha=0; aura+=1; }
+      /* puntaje de la misión: 1 punto por resolver; se penaliza si tuvo más de 3 errores técnicos */
+      puntoMision = 1;
+      if(s.e > 3){ puntoMision = 0.5; penalizada = true; misionesPenalizadas++; aura = Math.max(0, aura-1); }
+      puntajeMisiones += puntoMision;
+    }
+    return { k, label:PASO_LABEL[k], ok, v:s.v, f:s.f, e:s.e, ok1:s.ok1, ts:s.ts, codeId:codeDe[k], penalizada };
+  });
+  const totalPasos = PASOS.length;
+  const pctPrimera = resueltos ? Math.round(primera/resueltos*100) : 0;
+  const promIntentos = resueltos ? (totIntentos/resueltos) : 0;
+  const cobertura = Math.round(resueltos/totalPasos*100);
+  /* NOTA sugerida sobre 10: proporción de puntaje de misiones (ya penalizado por >3 errores)
+     sobre el total posible, más un pequeño bonus por resolver a la primera. */
+  const notaBase = (puntajeMisiones/totalPasos)*9;          /* hasta 9 por completar sin penalización */
+  const bonusPrimera = resueltos ? (primera/totalPasos)*1 : 0; /* hasta 1 extra por eficiencia */
+  const nota10 = Math.max(0, Math.min(10, Math.round((notaBase + bonusPrimera)*10)/10));
+  return { filas, resueltos, totalPasos, primera, pctPrimera, promIntentos, totErrores, aura, rachaMax, cobertura, nota10, puntajeMisiones, misionesPenalizadas };
+}
+
+function descargarReporteDesempeno(){
+  const d = calcularDesempeno();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const W = 210, M = 18;
+  const hoy = new Date().toLocaleDateString('es-UY',{day:'numeric',month:'long',year:'numeric'});
+
+  /* ── encabezado ── */
+  doc.setFillColor(12,14,24); doc.rect(0,0,W,34,'F');
+  doc.setTextColor(255,153,0); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.text('SHANUKI · REPORTE DE DESEMPEÑO', M, 13);
+  doc.setTextColor(230,230,230); doc.setFontSize(17);
+  doc.text('La Furia del Twister', M, 23);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(150,150,150);
+  doc.text('Ciencias de la Computación · ANEP · Ceibal · CREA', M, 30);
+
+  let y = 44;
+  doc.setTextColor(30,30,30); doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.text(`Operador/a: `, M, y);
+  doc.setFont('helvetica','bold'); doc.text(playerName, M+24, y);
+  doc.setFont('helvetica','normal');
+  doc.text(`Fecha: ${hoy}`, W-M, y, {align:'right'});
+  y += 6;
+  doc.setDrawColor(220,220,220); doc.line(M, y, W-M, y); y += 10;
+
+  /* ── NOTA SUGERIDA (bloque destacado para libreta) ── */
+  const boxH = 32;
+  doc.setFillColor(243,240,255); doc.setDrawColor(124,58,237); doc.setLineWidth(0.6);
+  doc.roundedRect(M, y, W-2*M, boxH, 3, 3, 'FD');
+  /* etiqueta arriba */
+  doc.setTextColor(91,33,182); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.text('NOTA SUGERIDA PARA LIBRETA', M+8, y+9);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(120,110,140);
+  doc.text('escala 1 a 10', M+8, y+15);
+  /* número grande a la izquierda */
+  doc.setFont('helvetica','bold'); doc.setFontSize(30); doc.setTextColor(30,30,30);
+  const notaStr = String(d.nota10);
+  doc.text(notaStr, M+8, y+27);
+  const anchoNota = doc.getTextWidth(notaStr);  /* medido con fontSize 30 activo */
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(120,110,140);
+  doc.text('/ 10', M+8 + anchoNota + 4, y+27);
+  /* explicación a la derecha, dentro de su propia columna */
+  const explX = M + 58;
+  const explW = (W-M) - explX - 6;
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.6); doc.setTextColor(90,90,90);
+  const notaExpl = doc.splitTextToSize(
+    'Sugerencia orientativa: combina cobertura de misiones con calidad de proceso. Cada misión resuelta suma 1 punto; si tuvo más de 3 errores técnicos, ese punto se reduce a 0,5. Se suma un pequeño bonus por resolver a la primera. La decisión final es del/la docente.',
+    explW);
+  doc.text(notaExpl, explX, y+8);
+  y += boxH + 8;
+
+  /* ── grilla de métricas de proceso ── */
+  doc.setTextColor(30,30,30); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Métricas de proceso', M, y); y += 6;
+  const cards = [
+    { n:`${d.resueltos}/${d.totalPasos}`, l:'Misiones resueltas' },
+    { n:`${d.cobertura}%`, l:'Cobertura' },
+    { n:`${d.aura}`, l:'Aura (proceso)' },
+    { n:`${d.rachaMax}`, l:'Racha máxima' },
+    { n:`${d.pctPrimera}%`, l:'A la primera' },
+    { n:d.promIntentos ? d.promIntentos.toFixed(1) : '—', l:'Intentos promedio' },
+  ];
+  const cols = 3, gap = 4, cw = (W-2*M - gap*(cols-1))/cols, ch = 18;
+  cards.forEach((c,i)=>{
+    const cx = M + (i%cols)*(cw+gap);
+    const cy = y + Math.floor(i/cols)*(ch+gap);
+    doc.setFillColor(248,247,255); doc.setDrawColor(225,220,245); doc.setLineWidth(0.4);
+    doc.roundedRect(cx, cy, cw, ch, 2, 2, 'FD');
+    doc.setTextColor(91,33,182); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text(c.n, cx+5, cy+9);
+    doc.setTextColor(110,110,110); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.text(c.l.toUpperCase(), cx+5, cy+15);
+  });
+  y += Math.ceil(cards.length/cols)*(ch+gap) + 4;
+
+  doc.setFontSize(7.5); doc.setTextColor(120,120,120);
+  const glosa = doc.splitTextToSize(
+    'Aura: puntaje de proceso (+3 por misión resuelta a la primera, +2 extra por racha sostenida, +1 si costó varios intentos, -1 si superó 3 errores técnicos). Racha: misiones consecutivas resueltas a la primera. Estas métricas describen cómo se resolvió, no solo cuánto.',
+    W-2*M);
+  doc.text(glosa, M, y); y += glosa.length*3.6 + 6;
+
+  /* ── tabla por misión ── */
+  doc.setTextColor(30,30,30); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Detalle por misión', M, y); y += 6;
+  doc.setFillColor(240,230,216); doc.rect(M, y, W-2*M, 8, 'F');
+  doc.setFontSize(7.5); doc.setTextColor(120,60,10); doc.setFont('helvetica','bold');
+  doc.text('MISIÓN', M+3, y+5.5);
+  doc.text('ESTADO', M+82, y+5.5);
+  doc.text('INT.', M+108, y+5.5);
+  doc.text('ERR.', M+123, y+5.5);
+  doc.text('1.ª', M+139, y+5.5);
+  doc.text('PUNTAJE', M+150, y+5.5);
+  y += 8;
+  doc.setFont('helvetica','normal');
+  d.filas.forEach((f,i)=>{
+    if(i%2===0){ doc.setFillColor(250,250,250); doc.rect(M, y, W-2*M, 8, 'F'); }
+    doc.setTextColor(40,40,40); doc.setFontSize(7.4);
+    const lbl = doc.splitTextToSize(f.label, 74);
+    doc.text(lbl[0], M+3, y+5.2);
+    doc.setTextColor(f.ok?30:150, f.ok?120:60, f.ok?60:60);
+    doc.text(f.ok?'Resuelta':'Pendiente', M+82, y+5.2);
+    doc.setTextColor(40,40,40);
+    doc.text(f.ok? String(Math.max(f.v,1)) : (f.v?String(f.v):'—'), M+108, y+5.2);
+    /* errores: rojo si superó el umbral de penalización */
+    if(f.ok && f.e>3){ doc.setTextColor(190,30,30); doc.setFont('helvetica','bold'); }
+    doc.text(f.ok? String(f.e) : (f.e?String(f.e):'—'), M+123, y+5.2);
+    doc.setTextColor(40,40,40); doc.setFont('helvetica','normal');
+    doc.text(f.ok1?'Sí':'—', M+139, y+5.2);
+    /* puntaje de la misión con marca de penalización */
+    if(f.ok){
+      if(f.penalizada){ doc.setTextColor(190,30,30); doc.text('0,5  (-50%)', M+150, y+5.2); }
+      else { doc.setTextColor(30,120,60); doc.text('1,0', M+150, y+5.2); }
+    } else {
+      doc.setTextColor(150,150,150); doc.text('—', M+150, y+5.2);
+    }
+    doc.setTextColor(40,40,40);
+    y += 8;
+  });
+  /* fila de total */
+  doc.setFillColor(240,230,216); doc.rect(M, y, W-2*M, 8, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(120,60,10);
+  doc.text('PUNTAJE DE MISIONES', M+3, y+5.2);
+  doc.text(d.puntajeMisiones.toString().replace('.',',') + ' / ' + d.totalPasos, M+150, y+5.2);
+  y += 8;
+  if(d.misionesPenalizadas>0){
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(190,30,30);
+    doc.text('(!) ' + d.misionesPenalizadas + (d.misionesPenalizadas===1?' misión penalizada por superar 3 errores técnicos (-50% de su punto).':' misiones penalizadas por superar 3 errores técnicos (-50% de su punto).'), M+3, y+4);
+    y += 6;
+  }
+  y += 6;
+
+  /* ── evidencia de código ── */
+  if(y > 250){ doc.addPage(); y = 20; }
+  doc.setTextColor(30,30,30); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Evidencia del proceso — código entregado', M, y); y += 7;
+  d.filas.forEach(f=>{
+    const ta = document.getElementById(f.codeId);
+    const code = ta ? ta.value.trim() : '';
+    if(!code) return;
+    if(y > 262){ doc.addPage(); y = 20; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(50,50,50);
+    doc.text(f.label, M, y); y += 4;
+    doc.setFont('courier','normal'); doc.setFontSize(7.5); doc.setTextColor(30,30,30);
+    const lines = doc.splitTextToSize(code, W-2*M-8);
+    const h = lines.length*3.6 + 5;
+    doc.setFillColor(246,246,246); doc.rect(M, y-1, W-2*M, h, 'F');
+    doc.text(lines, M+3, y+3); y += h + 5;
+  });
+
+  /* ── pie ── */
+  const paginas = doc.internal.getNumberOfPages();
+  for(let p=1;p<=paginas;p++){
+    doc.setPage(p);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(150,150,150);
+    doc.text('Generado por ShanUKI como evidencia de proceso · La nota sugerida es orientativa; la decisión pedagógica es del/la docente.', M, 289);
+    doc.text(`Pág. ${p}/${paginas}`, W-M, 289, {align:'right'});
+  }
+
+  const safe = (playerName||'operador').replace(/\s+/g,'_');
+  doc.save(`twister_desempeno_${safe}.pdf`);
+}
+
+/* ════════ RESET ════════ */
+function resetAll(){
+  Object.keys(flags).forEach(k=>flags[k]=false);
+  stats={}; initStats();
+  state.refugio_usuario=null; state.inventario_usuario=[]; state.suministro_requerido=null; state.es_seguro=null;
+  try{
+    localStorage.removeItem(LS.flags); localStorage.removeItem(LS.state); localStorage.removeItem(LS.screen); localStorage.removeItem(LS.stats);
+    CODE_IDS.forEach(id=>localStorage.removeItem(LS.code(id)));
+  }catch(e){}
+  CODE_IDS.forEach(id=>{ const el=document.getElementById(id); if(el){
+    if(id==='code1_step2') el.value='# La lista "refugios" del Paso 1 ya está en memoria.\n';
+    else if(id==='code2_step2') el.value='# La lista "suministros_clave" del Paso 1 ya está en memoria.\n';
+    else if(id==='code3') el.value='# "suministros_clave" e "inventario_usuario" ya están en memoria.\n';
+    else if(id==='code4') el.value='# "es_seguro" y "suministro_requerido" ya están en memoria.\n';
+    else el.value='';
+  }});
+  ['out1_step1','out1_step2','out2_step1','out2_step2','out3','out4'].forEach(o=>{
+    const el=document.getElementById(o); if(el){ el.classList.add('empty'); el.textContent='La salida de tu código aparecerá aquí.'; }
+  });
+  ['status1_step1','status1_step2','status2_step1','status2_step2','status3','status4'].forEach(s=>{
+    const el=document.getElementById(s); if(el){ el.className='status-message'; el.textContent=''; }
+  });
+  for(let i=1;i<=6;i++){ const b=document.getElementById('next-'+i); if(b) b.disabled=true; }
+  goTo(0);
+}
+
+/* ════════ EDITOR: TAB + AUTO-INDENTACIÓN PYTHON ════════ */
+document.addEventListener('keydown',e=>{
+  const ta = e.target;
+  if(ta.tagName!=='TEXTAREA') return;
+
+  /* TAB → 4 espacios */
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const s=ta.selectionStart;
+    ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(ta.selectionEnd);
+    ta.selectionStart=ta.selectionEnd=s+4;
+    ta.dispatchEvent(new Event('input'));
+    return;
+  }
+
+  /* ENTER → mantener sangría; +4 espacios si la línea termina en ':' (estructura de control) */
+  if(e.key==='Enter'){
+    const pos = ta.selectionStart;
+    /* solo auto-indenta cuando no hay selección múltiple */
+    if(pos !== ta.selectionEnd) return;
+    const antes = ta.value.substring(0, pos);
+    const inicioLinea = antes.lastIndexOf('\n') + 1;
+    const lineaActual = antes.substring(inicioLinea);
+    /* sangría actual: espacios/tabs al inicio de la línea */
+    const sangriaMatch = lineaActual.match(/^[ \t]*/);
+    let sangria = sangriaMatch ? sangriaMatch[0] : '';
+    /* ¿la línea (sin comentarios ni espacios finales) termina en ':' ? */
+    const sinComentario = lineaActual.replace(/#.*$/,'').replace(/\s+$/,'');
+    const abreBloque = /:$/.test(sinComentario);
+    if(abreBloque) sangria += '    ';
+    if(sangria.length===0) return; /* sin sangría que aplicar: comportamiento normal */
+    e.preventDefault();
+    const insert = '\n' + sangria;
+    ta.value = ta.value.substring(0,pos) + insert + ta.value.substring(ta.selectionEnd);
+    ta.selectionStart = ta.selectionEnd = pos + insert.length;
+    ta.dispatchEvent(new Event('input'));
+  }
+});
+
+/* ════════ INIT ════════ */
+(async()=>{
+  buildDots();
+  loadAll();
+  try{ SFX.on = localStorage.getItem('twz_sound')!=='0'; }catch(e){ SFX.on=true; }
+  paintSoundBtn();
+  renderSupplies(); wireVideos(); wireHints();
+  /* el audio del navegador solo arranca después de un toque del usuario */
+  const despertarAudio=()=>{ if(SFX.on){ SFX.init(); if(SFX.ctx&&SFX.ctx.state==='suspended') SFX.ctx.resume(); SFX.ambient(!anyVideoPlaying()); } };
+  window.addEventListener('pointerdown', despertarAudio, {once:true});
+  window.addEventListener('keydown', despertarAudio, {once:true});
+  fillNarrative();
+  if(playerName && playerName!=="operador"){ const inp=document.getElementById('playerName'); if(inp) inp.value=playerName; }
+  if(flags.m1s1) unlockNext(1);
+  if(flags.m1s2) unlockNext(2);
+  if(flags.m2s1) unlockNext(3);
+  if(flags.m2s2) unlockNext(4);
+  if(flags.m3) unlockNext(5);
+  if(flags.m4) unlockNext(6);
+
+  document.getElementById('loading').style.display='none';
+  goTo(currentScreen);
+
+  setBootStatus('⏳ Cargando el motor de Python en segundo plano…');
+  if(typeof loadPyodide==="undefined"){
+    setBootStatus('⚠️ No se pudo descargar el motor de Python (CDN bloqueada). Revisa la conexión o el firewall y recarga la página. La historia y las consignas funcionan igual.');
+    return;
+  }
+  try{
+    pyodideReadyPromise = withTimeout(loadPyodide(), 60000, "tiempo de carga de Python agotado");
+    const py = await pyodideReadyPromise;
+    pyodideGlobal = py; pyodideReady = true;
+    overrideInput(py); inject(py);
+    setBootStatus('✅ Python listo. Ya puedes ejecutar tu código.', true);
+  }catch(e){
+    setBootStatus('⚠️ El motor de Python no terminó de cargar ('+(e&&e.message?e.message:'error')+'). Prueba recargar la página. La historia y las consignas siguen disponibles.');
+  }
+})();
+
+/* Muestra un aviso de arranque discreto en la barra superior */
+function setBootStatus(msg, ok){
+  let el=document.getElementById('bootStatus');
+  if(!el){
+    el=document.createElement('div');
+    el.id='bootStatus';
+    el.style.cssText='position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:120;'+
+      'font-family:Roboto Mono,monospace;font-size:.72rem;padding:8px 16px;border-radius:99px;'+
+      'background:rgba(255,153,0,.12);border:1px solid rgba(255,153,0,.4);color:#ffb86b;max-width:92%;text-align:center';
+    document.body.appendChild(el);
+  }
+  el.textContent=msg;
+  if(ok){ el.style.background='rgba(76,175,80,.12)'; el.style.borderColor='rgba(76,175,80,.45)'; el.style.color='#7be07b';
+    setTimeout(()=>{ if(el) el.style.display='none'; }, 3500); }
+}
+
+/* Promise con límite de tiempo */
+function withTimeout(promise, ms, label){
+  return Promise.race([
+    promise,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error(label||'timeout')), ms))
+  ]);
+}
+</script>
+</body>
+</html>
