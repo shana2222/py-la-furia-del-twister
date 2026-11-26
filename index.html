@@ -1223,12 +1223,12 @@ function toggleTheme(){
 function fillNarrative(){
   const N = escapeHTML(playerName);
   const set=(id,html)=>{ const el=document.getElementById(id); if(el) el.innerHTML=html; };
-  set('m1p1-story1', `<strong>${N}</strong>, el sistema encontró <strong>3 refugios</strong>. Muéstralos numerados para que el equipo pueda elegir.`);
-  set('m1p2-story1', `Bien, <strong>${N}</strong>. La lista ya está en pantalla. Ahora la persona de turno elige un número y tu programa tiene que saber qué refugio es.`);
-  set('m2p1-story1', `<strong>${N}</strong>, hay <strong>9 suministros</strong> en la zona. El dron carga solo <strong>5</strong>, y uno de ellos te va a salvar.`);
-  set('m2p2-story1', `El dron espera, <strong>${N}</strong>. La carga termina con <strong>5 objetos</strong> o cuando alguien escribe <strong>«salir»</strong>.`);
-  set('m3-story1', `¡Las paredes tiemblan, <strong>${N}</strong>! El refugio necesita un suministro elegido al azar. ¿Lo tienes en la valija?`);
-  set('m4-story1', `Impacto en <strong>120 segundos</strong>, <strong>${N}</strong>. Tu if / else decide el final.`);
+  set('m1p1-story1', `Las sirenas no paran, <strong>${N}</strong>. La pantalla de emergencia parpadea en rojo: <strong>PROTOCOLO DE EVACUACIÓN ACTIVADO</strong>. El radar encontró tres refugios a menos de 15 km, pero nadie puede verlos hasta que tu programa los muestre en pantalla. Afuera, el viento ya arranca las chapas de los techos.`);
+  set('m1p2-story1', `Los tres refugios brillan en la pantalla, <strong>${N}</strong>. Llega la decisión más importante de tu vida. Cuando ejecutes el programa, el sistema te va a pedir que escribas <strong>un número con el teclado</strong>: 1, 2 o 3. ¿Bajo tierra, en la montaña o entre los árboles? Un solo número decide dónde vas a pasar la noche más larga de tu vida. <strong>Piénsalo bien.</strong>`);
+  set('m2p1-story1', `Llegaste al refugio, <strong>${N}</strong>… pero está vacío. Afuera el cielo se volvió negro y la lluvia golpea de costado. El dron de carga detectó <strong>9 suministros</strong> desparramados en la zona de peligro. Antes de salir a buscarlos, tu programa tiene que mostrar la lista completa: lo que no está en la lista, no existe.`);
+  set('m2p2-story1', `El dron zumba sobre tu cabeza, <strong>${N}</strong>, listo para despegar. Solo aguanta <strong>5 objetos</strong> antes de que el viento lo derribe. Cuando ejecutes el programa, vas a elegir uno por uno, <strong>escribiendo con el teclado</strong>. ¿La manta o la radio? ¿La linterna o el botiquín? Uno de esos objetos te va a salvar la vida, y todavía no sabes cuál. Si no quieres arriesgar más el dron, escribe <strong>«salir»</strong>.`);
+  set('m3-story1', `<strong>¡CRACK!</strong> Una grieta recorre la pared del refugio, <strong>${N}</strong>. El sensor estructural lanza la alerta roja: hace falta un suministro para sellar el punto débil, y el sistema lo va a elegir <strong>al azar</strong>. Tu programa tiene que sortearlo y revisar tu valija. Contén la respiración… ¿lo trajiste o lo dejaste atrás?`);
+  set('m4-story1', `Se cortó la luz, <strong>${N}</strong>. La radio chisporrotea un último mensaje: <strong>IMPACTO EN 120 SEGUNDOS</strong>. El rugido del twister ya suena sobre el techo. Todo lo que hiciste hasta ahora se decide en este momento: tu <strong>if / else</strong> va a leer <code>es_seguro</code> y anunciar el final. Victoria… o game over.`);
 }
 function escapeHTML(t){ return String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
