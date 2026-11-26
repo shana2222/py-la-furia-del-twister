@@ -485,6 +485,12 @@
     .ruleta{grid-template-columns:repeat(3,1fr)}
     .vid{max-width:520px; margin:0 auto}
   }
+  /* ── programa completo ── */
+  .full-prog{margin-top:34px; padding-top:24px; border-top:1px dashed rgba(255,153,0,.3)}
+  .full-lead{font-size:.95rem; color:var(--muted); margin-bottom:14px; max-width:760px}
+  textarea.tall{min-height:420px}
+  .term.tall{min-height:420px; max-height:560px; overflow-y:auto}
+  .term .ans{color:#111; background:var(--ambar); border-radius:4px; padding:0 6px; font-weight:700}
   /* ── simulador ── */
   .hdr-sim{background:rgba(255,209,102,.12); border:1px solid var(--ambar); color:var(--ambar);
     padding:6px 11px; border-radius:8px; cursor:pointer; font-family:'Orbitron',sans-serif; font-size:.6rem; letter-spacing:.5px; white-space:nowrap}
@@ -1146,6 +1152,30 @@ print(f"Hola, {nombre}")</code></div>
   <section class="screen" data-screen="7">
     <span class="mission-tag">// desenlace</span>
     <div class="ending" id="ending"></div>
+
+    <div class="full-prog" id="fullProg">
+      <div class="step-label"><span class="num">🧩</span> Tu programa completo</div>
+      <p class="full-lead">Este es tu código de las 4 misiones, unido en un solo programa. Ejecútalo entero: vas a elegir de nuevo el refugio y la valija, y el sorteo puede cambiar. ¿Sobrevives otra vez?</p>
+      <div class="split">
+        <div class="split-pane">
+          <div class="ed-bar">
+            <span class="ed-dot" style="background:#ff5f57"></span><span class="ed-dot" style="background:#febc2e"></span><span class="ed-dot" style="background:#28c840"></span>
+            <span class="fname">furia_del_twister.py</span>
+          </div>
+          <textarea id="code_full" spellcheck="false" class="tall"></textarea>
+          <div class="btn-row">
+            <button class="btn btn-red" onclick="runFull()">▶ Ejecutar mi programa</button>
+            <button class="btn btn-ghost" onclick="armarCompleto(true)" title="Vuelve a juntar el código de cada misión">↺ Volver a armar</button>
+            <button class="btn btn-pdf" onclick="descargarPy()">💾 Descargar .py</button>
+            <span id="status_full" class="status-message"></span>
+          </div>
+        </div>
+        <div class="split-pane">
+          <div class="pane-label">▸ salida</div>
+          <div class="term empty tall" id="out_full">La salida de tu programa completo aparecerá aquí.</div>
+        </div>
+      </div>
+    </div>
   </section>
 
   </div>
@@ -1210,7 +1240,8 @@ const PASO_LABEL = {
   m2s1:'Misión 2 · Paso 1 — Listar suministros',
   m2s2:'Misión 2 · Paso 2 — Cargar la valija',
   m3:'Misión 3 — Verificación estructural',
-  m4:'Misión Final — Resultado del Twister'
+  m4:'Misión Final — Resultado del Twister',
+  completo:'Programa completo (las 4 misiones)'
 };
 let stats = {};
 function initStats(){
@@ -1247,7 +1278,7 @@ const LS = {
   flags:'twz_flags', state:'twz_state', name:'twz_name', theme:'twz_theme', screen:'twz_screen', stats:'twz_stats',
   code:id=>`twz_code_${id}`
 };
-const CODE_IDS = ['code1_step1','code1_step2','code2_step1','code2_step2','code3','code4'];
+const CODE_IDS = ['code1_step1','code1_step2','code2_step1','code2_step2','code3','code4','code_full'];
 
 function saveAll(){
   try{
@@ -1333,7 +1364,7 @@ function goTo(s){
   autoVideo = true;
   SFX.whoosh();
   refreshVisuals();
-  if(s===7) renderEnding();
+  if(s===7){ renderEnding(); armarCompleto(false); }
 }
 let autoVideo = false; /* no reproducir solo al cargar la página (sin gesto del usuario) */
 
@@ -2117,6 +2148,95 @@ function descargarReporteDesempeno(){
   doc.save(`twister_desempeno_${safe}.pdf`);
 }
 
+/* ════════ PROGRAMA COMPLETO ════════ */
+const TITULOS_ETAPA = ['Misión 1 · Paso 1: mostrar refugios','Misión 1 · Paso 2: elegir refugio','Misión 2 · Paso 1: mostrar suministros','Misión 2 · Paso 2: cargar la valija','Misión 3: sorteo y verificación','Misión 4: el final'];
+function armarCompleto(forzar){
+  const ta = document.getElementById('code_full'); if(!ta) return;
+  let editado = false; try{ editado = localStorage.getItem('twz_full_edit')==='1'; }catch(e){}
+  if(!forzar && ta.value.trim() && editado) return; /* respeta lo que el estudiante editó a mano */
+  const partes = CODE_IDS.slice(0,6).map((id,i)=>{
+    const el = document.getElementById(id);
+    const cod = (el ? el.value : '').split('\n').filter(l=>!/^\s*#.*(ya está|ya están) en memoria/.test(l)).join('\n').trim();
+    return `# ── ${TITULOS_ETAPA[i]} ──\n` + (cod || '# (sin código)');
+  });
+  ta.value = `# 🌪️ La furia del Twister — programa de ${playerName}\n\n` + partes.join('\n\n') + '\n';
+  saveCode('code_full');
+  try{ localStorage.setItem('twz_full_edit','0'); }catch(e){}
+  if(forzar){ SFX.insert(); setStatus('status_full','status-warn','↺ Programa armado de nuevo con tu código de cada misión.'); }
+}
+async function runFull(){
+  const code = document.getElementById('code_full').value;
+  const outId='out_full', stId='status_full';
+  if(!code.trim()){ armarCompleto(true); }
+  if(!pyodideReady || !pyodideGlobal){ setTerm(outId,'⏳ El motor de Python todavía se está cargando. Espera unos segundos.'); return; }
+  const py = pyodideGlobal;
+  const term = document.getElementById(outId);
+  term.classList.remove('empty'); term.textContent = '⏳ Ejecutando tu programa completo…';
+  setStatus(stId,'status-warn','▶ En ejecución: responde las preguntas que aparezcan.');
+  const ns = py.globals.get('dict')();
+  ns.set('js_prompt', (msg="")=>{ try{ const v=prompt(msg||'Escribe un valor:'); return v===null?'':v; }catch(e){ return ''; } });
+  let salida='', error=null;
+  try{
+    await py.runPythonAsync(`
+import sys, io, time
+_buf = io.StringIO(); _old_out = sys.stdout; sys.stdout = _buf
+_t0 = time.time()
+def input(msg=""):
+    global _t0
+    sys.settrace(None)
+    a = time.time()
+    r = js_prompt(msg)
+    _t0 += time.time() - a
+    print(f"{msg}\x1f{r}")
+    sys.settrace(_guard)
+    return r
+def _guard(frame, event, arg):
+    if time.time() - _t0 > 3:
+        sys.settrace(None); raise Exception("BUCLE_INFINITO")
+    return _guard
+`, { globals: ns });
+    try{ await py.runPythonAsync('sys.settrace(_guard)\n' + code, { globals: ns }); }
+    catch(e){ error = e; }
+    salida = py.runPython('sys.settrace(None)\nsys.stdout = _old_out\n_buf.getvalue()', { globals: ns });
+  }catch(e){ error = error || e; }
+  finally{ try{ ns.destroy(); }catch(e){} }
+  term.innerHTML = String(salida||'').split('\n').map(l=>{
+    if(l.includes('\x1f')){ const [p,a]=l.split('\x1f'); return escapeHTML(p)+'<span class="ans">'+escapeHTML(a)+'</span>'; }
+    return escapeHTML(l);
+  }).join('\n');
+  const txt = String(salida||'').toLowerCase();
+  let r='ok';
+  if(error){
+    r='error';
+    const raw = String(error.message||error);
+    const msg = raw.includes('BUCLE_INFINITO') ? '⏳ Bucle infinito: el programa no termina.' : raw.trim().split('\n').slice(-1)[0];
+    const pista = ayudaDeError(raw);
+    term.insertAdjacentHTML('beforeend', '\n<span style="color:#ff8a80">❌ ' + escapeHTML(msg) + (pista ? '\n💡 ' + escapeHTML(pista) : '') + '</span>');
+    setStatus(stId,'status-fail','❌ Tu programa se detuvo con un error.'); SFX.fail();
+  } else if(txt.includes('sobrevivido')){
+    setStatus(stId,'status-pass','🏆 ¡Tu programa completo funciona y sobreviviste!'); SFX.win();
+  } else if(txt.includes('no resistió')){
+    setStatus(stId,'status-warn','💀 Tu programa funciona… pero esta vez el twister ganó. Prueba otra valija.'); SFX.lose();
+  } else {
+    setStatus(stId,'status-warn','⚠️ El programa terminó, pero no mostró el mensaje final.'); r='fallo'; SFX.fail();
+  }
+  historial.push({ k:'completo', t:Date.now(), r, post:false });
+  saveAll();
+}
+document.addEventListener('input', e=>{
+  if(e.target && e.target.id==='code_full' && e.isTrusted){ try{ localStorage.setItem('twz_full_edit','1'); }catch(err){} }
+});
+function descargarPy(){
+  const code = document.getElementById('code_full').value;
+  const blob = new Blob([code], {type:'text/x-python'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `furia_del_twister_${(playerName||'operador').replace(/\s+/g,'_')}.py`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  SFX.click();
+}
+
 /* ════════ SIMULADOR DE LA OPERACIÓN ════════
    Reproduce el programa acumulado: todas las etapas resueltas + la actual. */
 const ETAPAS = [
@@ -2294,7 +2414,7 @@ function resetAll(){
   stats={}; initStats(); historial=[];
   state.refugio_usuario=null; state.inventario_usuario=[]; state.suministro_requerido=null; state.es_seguro=null;
   try{
-    localStorage.removeItem(LS.flags); localStorage.removeItem(LS.state); localStorage.removeItem(LS.screen); localStorage.removeItem(LS.stats); localStorage.removeItem('twz_hist');
+    localStorage.removeItem(LS.flags); localStorage.removeItem(LS.state); localStorage.removeItem(LS.screen); localStorage.removeItem(LS.stats); localStorage.removeItem('twz_hist'); localStorage.removeItem('twz_full_edit');
     CODE_IDS.forEach(id=>localStorage.removeItem(LS.code(id)));
   }catch(e){}
   CODE_IDS.forEach(id=>{ const el=document.getElementById(id); if(el){

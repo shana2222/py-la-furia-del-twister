@@ -22,4 +22,5 @@ La carpeta `assets/` tiene que estar al lado del HTML.
 - Diagramas que reaccionan al código: índices 1→0, la valija del dron, el sorteo de `random.choice()` y la bifurcación del `if / else`.
 - Botones 📋 para insertar el texto exacto (entre comillas) de listas, `input()` y `print()`.
 - Simulador de la operación (🖥️): ejecuta el programa del estudiante en la misión actual, encadenado con lo que programó antes, y muestra el resultado esperado. Las tarjetas de resumen acumulan refugio, valija, sorteo y final.
+- Al final, "Tu programa completo": junta el código de las 4 misiones en un solo programa que el estudiante ejecuta entero (con entradas reales y sorteo al azar) y puede descargar como `.py`.
 - Tarjetas de repaso y pistas plegables, reporte de desempeño para CREA (PDF), modo claro/oscuro y progreso guardado.
