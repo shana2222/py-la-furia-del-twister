@@ -304,6 +304,7 @@
     .brand{width:100%}
     .header-right{width:100%;justify-content:space-between;gap:8px}
     .theme-toggle{padding:5px 8px;font-size:.55rem}
+    .header-right{flex-wrap:wrap; row-gap:6px}
     .hdr-report{padding:5px 8px;font-size:.55rem}
     .sdot{width:7px;height:7px}
     .steps-dots{gap:4px}
@@ -484,6 +485,58 @@
     .ruleta{grid-template-columns:repeat(3,1fr)}
     .vid{max-width:520px; margin:0 auto}
   }
+  /* ── simulador ── */
+  .hdr-sim{background:rgba(255,209,102,.12); border:1px solid var(--ambar); color:var(--ambar);
+    padding:6px 11px; border-radius:8px; cursor:pointer; font-family:'Orbitron',sans-serif; font-size:.6rem; letter-spacing:.5px; white-space:nowrap}
+  .hdr-sim:hover{background:var(--ambar); color:#111}
+  body.light .hdr-sim{color:#92400e; border-color:#d97706}
+  @media(max-width:520px){ .hdr-sim{padding:5px 8px;font-size:.55rem} }
+  .btn-sim{background:rgba(255,209,102,.12); color:var(--ambar); border:1px solid rgba(255,209,102,.5)}
+  .btn-sim:hover{background:var(--ambar); color:#111}
+  body.light .btn-sim{color:#92400e}
+  .sim-overlay{position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.72); backdrop-filter:blur(4px);
+    display:none; align-items:flex-start; justify-content:center; padding:24px 12px; overflow-y:auto}
+  .sim-overlay.open{display:flex; animation:rise .3s ease-out}
+  .sim-panel{width:min(880px,100%); background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px;
+    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px rgba(255,153,0,.12)}
+  .sim-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px}
+  .sim-kicker{font:.64rem 'Roboto Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--rojo)}
+  .sim-head h3{font-family:'Orbitron',sans-serif; font-size:1.15rem; color:var(--naranja); margin-top:4px}
+  .sim-close{background:transparent; border:1px solid var(--border); color:var(--texto); border-radius:8px; width:34px; height:34px; cursor:pointer; font-size:1rem}
+  .sim-stages{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-bottom:14px}
+  .sim-st{display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px; border-radius:10px; text-align:center;
+    border:1px solid rgba(255,255,255,.08); font-size:.64rem; color:var(--muted); line-height:1.3}
+  body.light .sim-st{border-color:#e5e7eb}
+  .sim-st .ic{font-size:1.2rem}
+  .sim-st.done{border-color:rgba(76,175,80,.55); background:rgba(76,175,80,.08); color:var(--texto)}
+  .sim-st.cur{border-color:var(--naranja); background:rgba(255,153,0,.12); color:var(--texto); box-shadow:0 0 14px var(--glow2)}
+  .sim-st.lock{opacity:.45}
+  .sim-tabs{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px}
+  .sim-tab{padding:8px 14px; border-radius:9px; cursor:pointer; font:700 .78rem 'Fira Sans',sans-serif;
+    background:transparent; color:var(--muted); border:1px solid var(--border)}
+  .sim-tab.on{background:var(--naranja); color:#111; border-color:var(--naranja)}
+  .sim-spacer{flex:1}
+  .sim-note{font-size:.82rem; color:var(--muted); margin-bottom:10px}
+  .sim-term{background:#020305; border:1px solid rgba(76,175,80,.35); border-radius:12px; padding:14px 16px; min-height:220px; max-height:46vh; overflow-y:auto;
+    font:.82rem/1.7 'Roboto Mono',monospace; color:#d0f0d0; white-space:pre-wrap; word-break:break-word}
+  .sim-term .hdr{display:block; margin:8px 0 4px; padding:3px 10px; border-radius:6px; background:rgba(255,153,0,.12); color:var(--naranja); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase}
+  .sim-term .hdr:first-child{margin-top:0}
+  .sim-term .ans{color:#111; background:var(--ambar); border-radius:4px; padding:0 6px; font-weight:700}
+  .sim-term .err{color:#ff8a80}
+  .sim-term .cursor{display:inline-block; width:8px; height:1em; background:#7be07b; vertical-align:-2px; animation:blink 1s infinite}
+  .sim-term .dim{color:#6b7280; font-style:italic}
+  .sim-summary{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px}
+  .sum-card{border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center; min-width:0}
+  .sum-card .t{font:700 .62rem 'Roboto Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
+  .sum-card .v{font-size:.86rem; font-weight:600}
+  .sum-card .big{font-size:1.6rem; line-height:1.2}
+  .sum-card.lock{opacity:.4}
+  .sum-card.ok{border-color:rgba(76,175,80,.6)} .sum-card.bad{border-color:rgba(255,77,77,.6)}
+  @media(max-width:640px){
+    .sim-stages{grid-template-columns:repeat(3,1fr)}
+    .sim-summary{grid-template-columns:repeat(2,1fr)}
+    .sim-play{width:100%}
+  }
   @media(prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
   }
@@ -503,6 +556,7 @@
       <h1 id="brandTitle">LA FURIA DEL TWISTER</h1>
     </div>
     <div class="header-right">
+      <button class="hdr-sim" onclick="openSim()" id="simBtn" title="Ver tu programa completo hasta esta etapa">🖥️ Simulador</button>
       <button class="hdr-report" onclick="descargarReporteDesempeno()" id="reportBtn" title="Generar el reporte de desempeño para la libreta de CREA">📊 Reporte</button>
       <button class="snd-toggle" onclick="toggleSound()" id="sndBtn" title="Activar o silenciar sonidos">🔇 Sonido</button>
       <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Modo claro</button>
@@ -644,6 +698,7 @@ numero = int(input("Número: "))</code></div>
 
     <div class="nav-bar">
       <button class="btn btn-ghost" onclick="goTo(0)">← Intro</button>
+      <button class="btn btn-sim" onclick="openSim()">🖥️ Simular hasta aquí</button>
       <div class="nav-spacer"></div>
       <button class="btn btn-go" id="next-1" onclick="goTo(2)" disabled>Paso 2 →</button>
     </div>
@@ -711,6 +766,7 @@ numero = int(input("Número: "))</code></div>
 
     <div class="nav-bar">
       <button class="btn btn-ghost" onclick="goTo(1)">← Paso 1</button>
+      <button class="btn btn-sim" onclick="openSim()">🖥️ Simular hasta aquí</button>
       <div class="nav-spacer"></div>
       <button class="btn btn-go" id="next-2" onclick="goTo(3)" disabled>Misión 2 →</button>
     </div>
@@ -806,6 +862,7 @@ len(mi_lista) &lt; 5  # True/False</code></div>
 
     <div class="nav-bar">
       <button class="btn btn-ghost" onclick="goTo(2)">← Misión 1</button>
+      <button class="btn btn-sim" onclick="openSim()">🖥️ Simular hasta aquí</button>
       <div class="nav-spacer"></div>
       <button class="btn btn-go" id="next-3" onclick="goTo(4)" disabled>Paso 2 →</button>
     </div>
@@ -889,6 +946,7 @@ len(mi_lista) &lt; 5  # True/False</code></div>
 
     <div class="nav-bar">
       <button class="btn btn-ghost" onclick="goTo(3)">← Paso 1</button>
+      <button class="btn btn-sim" onclick="openSim()">🖥️ Simular hasta aquí</button>
       <div class="nav-spacer"></div>
       <button class="btn btn-go" id="next-4" onclick="goTo(5)" disabled>Misión 3 →</button>
     </div>
@@ -982,6 +1040,7 @@ print(es_seguro)</code></div>
 
     <div class="nav-bar">
       <button class="btn btn-ghost" onclick="goTo(4)">← Misión 2</button>
+      <button class="btn btn-sim" onclick="openSim()">🖥️ Simular hasta aquí</button>
       <div class="nav-spacer"></div>
       <button class="btn btn-go" id="next-5" onclick="goTo(6)" disabled>Misión final →</button>
     </div>
@@ -1077,6 +1136,7 @@ print(f"Hola, {nombre}")</code></div>
 
     <div class="nav-bar">
       <button class="btn btn-ghost" onclick="goTo(5)">← Misión 3</button>
+      <button class="btn btn-sim" onclick="openSim()">🖥️ Simular hasta aquí</button>
       <div class="nav-spacer"></div>
       <button class="btn btn-go" id="next-6" onclick="goTo(7)" disabled>Ver el desenlace →</button>
     </div>
@@ -1090,6 +1150,29 @@ print(f"Hola, {nombre}")</code></div>
 
   </div>
 </main>
+
+<!-- ════════ SIMULADOR DE LA OPERACIÓN ════════ -->
+<div class="sim-overlay" id="simOverlay" onclick="if(event.target===this) closeSim()">
+  <div class="sim-panel" role="dialog" aria-modal="true" aria-labelledby="simTitle">
+    <div class="sim-head">
+      <div>
+        <div class="sim-kicker">// simulador de la operación</div>
+        <h3 id="simTitle">🖥️ Tu programa en esta misión</h3>
+      </div>
+      <button class="sim-close" onclick="closeSim()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="sim-stages" id="simStages"></div>
+    <div class="sim-tabs">
+      <button class="sim-tab" data-mode="mio" onclick="setSimMode('mio')">🧑‍💻 Mi programa</button>
+      <button class="sim-tab" data-mode="esperado" onclick="setSimMode('esperado')">🎯 Resultado esperado</button>
+      <div class="sim-spacer"></div>
+      <button class="btn btn-red sim-play" onclick="playSim()">▶ Reproducir</button>
+    </div>
+    <p class="sim-note" id="simNote"></p>
+    <div class="sim-term" id="simTerm"></div>
+    <div class="sim-summary" id="simSummary"></div>
+  </div>
+</div>
 
 <footer>
   <p>⚡ Aventura: La Furia del Twister · Ciencias de la Computación · ANEP EBI 2026</p>
@@ -2032,6 +2115,177 @@ function descargarReporteDesempeno(){
 
   const safe = (playerName||'operador').replace(/\s+/g,'_');
   doc.save(`twister_desempeno_${safe}.pdf`);
+}
+
+/* ════════ SIMULADOR DE LA OPERACIÓN ════════
+   Reproduce el programa acumulado: todas las etapas resueltas + la actual. */
+const ETAPAS = [
+  { k:'m1s1', code:'code1_step1', ic:'🏕️', label:'Refugios' },
+  { k:'m1s2', code:'code1_step2', ic:'🔢', label:'Elección' },
+  { k:'m2s1', code:'code2_step1', ic:'📦', label:'Suministros' },
+  { k:'m2s2', code:'code2_step2', ic:'🧳', label:'Valija' },
+  { k:'m3',   code:'code3',       ic:'🎲', label:'Sorteo' },
+  { k:'m4',   code:'code4',       ic:'⚡', label:'Final' },
+];
+let simMode = 'mio', simTimer = null;
+/* primera etapa de la misión actual: M1 = 0-1, M2 = 2-3, M3 = 4, M4 = 5 */
+function inicioMision(e){ return e<=1 ? 0 : (e<=3 ? 2 : e); }
+function etapaActual(){ return currentScreen>=7 ? 5 : Math.max(0, Math.min(5, currentScreen-1)); }
+function openSim(){
+  document.getElementById('simOverlay').classList.add('open');
+  const cur = ETAPAS[etapaActual()];
+  const tieneCodigo = ETAPAS.slice(0, etapaActual()+1).some(e=>{ const t=document.getElementById(e.code); return t && /^(?!\s*#).*\S/m.test(t.value); });
+  setSimMode(tieneCodigo ? 'mio' : 'esperado', true);
+  SFX.click(); playSim();
+}
+function closeSim(){ document.getElementById('simOverlay').classList.remove('open'); if(simTimer) clearTimeout(simTimer); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSim(); });
+function setSimMode(m, silent){
+  simMode = m;
+  document.querySelectorAll('.sim-tab').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
+  if(!silent) playSim();
+}
+function pyRepr(arr){ return '[' + arr.map(x=>`'${x}'`).join(', ') + ']'; }
+function datosSim(){
+  const inv = (state.inventario_usuario && state.inventario_usuario.length) ? state.inventario_usuario : ['manta','fuego','botiquin'];
+  const idx = state.refugios.indexOf(state.refugio_usuario);
+  const ref = idx>=0 ? state.refugio_usuario : 'en las Montañas';
+  const sr = state.suministro_requerido || 'botiquin';
+  const es = typeof state.es_seguro==='boolean' ? state.es_seguro : inv.includes(sr);
+  return { inv, ref, num: (idx>=0?idx:1)+1, sr, es };
+}
+/* líneas: {t:'hdr'|'out'|'in'|'err'|'dim', s, a} */
+function lineasEsperadas(hasta){
+  const d = datosSim(), L = [];
+  const desde = inicioMision(hasta);
+  if(desde>0) L.push({t:'dim', s:'▸ Las misiones anteriores ya están cumplidas: sus variables siguen en memoria.'});
+  for(let i=desde;i<=hasta;i++){
+    L.push({t:'hdr', s:`Etapa ${i+1} · ${ETAPAS[i].label}`});
+    if(i===0) state.refugios.forEach((r,j)=>L.push({t:'out', s:`${j+1}. ${r}`}));
+    if(i===1){ L.push({t:'in', s:'Elige tu refugio (1, 2 o 3): ', a:String(d.num)}); L.push({t:'out', s:`Has elegido: ${d.ref}`}); }
+    if(i===2) state.suministros_clave.forEach((r,j)=>L.push({t:'out', s:`${j+1}. ${r}`}));
+    if(i===3){
+      d.inv.forEach(x=>L.push({t:'in', s:"¿Qué suministro agregas? (o 'salir'): ", a:x}));
+      if(d.inv.length<5) L.push({t:'in', s:"¿Qué suministro agregas? (o 'salir'): ", a:'salir'});
+      L.push({t:'out', s:`Tu inventario: ${pyRepr(d.inv)}`});
+    }
+    if(i===4){ L.push({t:'out', s:`Suministro requerido: ${d.sr}`}); L.push({t:'out', s:`¿Está en tu inventario?: ${d.es?'True':'False'}`}); }
+    if(i===5) L.push({t:'out', s: d.es
+      ? `🏆 ¡Has sobrevivido al Twister! El refugio resistió. ¡Felicidades, ganaste con el ${d.sr}!`
+      : `💀 El refugio no resistió el Twister. Te faltó el ${d.sr}. Game Over, camarada.`});
+  }
+  return L;
+}
+async function lineasDeMiPrograma(hasta){
+  if(!pyodideReady || !pyodideGlobal) return [{t:'err', s:'⏳ El motor de Python todavía no está listo. Espera unos segundos y vuelve a reproducir.'}];
+  const py = pyodideGlobal, d = datosSim();
+  /* respuestas de teclado: las que dio el estudiante */
+  const respuestas = [String(d.num), ...d.inv]; if(d.inv.length<5) respuestas.push('salir');
+  let codigo = '', incluidas = 0;
+  for(let i=0;i<=hasta;i++){
+    const ta = document.getElementById(ETAPAS[i].code);
+    const txt = ta ? ta.value : '';
+    const vacio = !/^(?!\s*#).*\S/m.test(txt);
+    codigo += `print("\x1e${i}")\n`;
+    if(vacio){ codigo += `print("\x1d")\n`; continue; }
+    codigo += txt.replace(/\t/g,'    ') + '\n'; incluidas++;
+  }
+  if(!incluidas) return [{t:'dim', s:'Todavía no escribiste código. Mira el «Resultado esperado» para ver hacia dónde vas.'}];
+  const ns = py.globals.get('dict')();
+  ns.set('_answers', py.toPy(respuestas));
+  ns.set('_SR', state.suministro_requerido || null);
+  let salida = '', error = null;
+  try{
+    await py.runPythonAsync(`
+import sys, io, time, random as _r
+_buf = io.StringIO(); _old_out = sys.stdout; sys.stdout = _buf
+def input(msg=""):
+    a = _answers.pop(0) if _answers else ""
+    print(f"{msg}\x1f{a}")
+    return a
+_orig_choice = _r.choice
+if _SR:
+    _r.choice = lambda seq: _SR if _SR in list(seq) else _orig_choice(seq)
+_t0 = time.time()
+def _guard(frame, event, arg):
+    if time.time() - _t0 > 2.5:
+        sys.settrace(None); raise Exception("BUCLE_INFINITO")
+    return _guard
+`, { globals: ns });
+    try{
+      await py.runPythonAsync(`sys.settrace(_guard)
+` + codigo, { globals: ns });
+    }catch(e){ error = e; }
+    salida = py.runPython(`sys.settrace(None)
+sys.stdout = _old_out
+_r.choice = _orig_choice
+_buf.getvalue()`, { globals: ns });
+  }catch(e){ error = error || e; }
+  finally{ try{ ns.destroy(); }catch(e){} }
+  const L = [], desde = inicioMision(hasta);
+  if(desde>0) L.push({t:'dim', s:'▸ Tu código de las misiones anteriores corrió en silencio: sus variables siguen en memoria.'});
+  let mostrar = desde===0;
+  String(salida||'').split('\n').forEach(l=>{
+    if(l.startsWith('\x1e') && +l.slice(1)>=desde) mostrar = true;
+    if(!mostrar) return;
+    if(l.startsWith('\x1e')){ const i=+l.slice(1); L.push({t:'hdr', s:`Etapa ${i+1} · ${ETAPAS[i].label}`}); }
+    else if(l==='\x1d') L.push({t:'dim', s:'(sin código en esta etapa todavía)'});
+    else if(l.includes('\x1f')){ const [p,a]=l.split('\x1f'); L.push({t:'in', s:p, a}); }
+    else if(l!=='') L.push({t:'out', s:l});
+  });
+  if(error && !mostrar) L.push({t:'dim', s:'⚠️ Falló una misión anterior. Vuelve a revisarla.'});
+  if(error){
+    const raw = String(error.message||error);
+    const msg = raw.includes('BUCLE_INFINITO') ? '⏳ Bucle infinito: el programa no termina.' : raw.trim().split('\n').slice(-1)[0];
+    L.push({t:'err', s:'❌ ' + msg});
+  }
+  return L;
+}
+function pintarEtapas(){
+  const cur = etapaActual();
+  document.getElementById('simStages').innerHTML = ETAPAS.map((e,i)=>{
+    const cls = flags[e.k] ? 'done' : (i===cur ? 'cur' : (i>cur ? 'lock' : ''));
+    const mark = flags[e.k] ? '✅' : (i===cur ? '▶' : (i>cur ? '🔒' : '⏳'));
+    return `<div class="sim-st ${cls}"><span class="ic">${e.ic}</span>${e.label}<span>${mark}</span></div>`;
+  }).join('');
+}
+function pintarResumen(){
+  const d = datosSim(), F = flags;
+  const card = (ok, t, v, extra='')=>`<div class="sum-card ${ok?extra:'lock'}"><div class="t">${t}</div>${ok?v:'<div class="big">🔒</div>'}</div>`;
+  document.getElementById('simSummary').innerHTML =
+    card(F.m1s2, 'Refugio', `<div class="big">${({'Subterráneo':'🕳️','en las Montañas':'⛰️','en el Bosque':'🌲'})[state.refugio_usuario]||'🏕️'}</div><div class="v">${escapeHTML(state.refugio_usuario||'')}</div>`, 'ok') +
+    card(F.m2s2, 'Valija', `<div class="big">${(state.inventario_usuario||[]).map(icono).join('')||'—'}</div><div class="v">${(state.inventario_usuario||[]).length}/5</div>`, 'ok') +
+    card(F.m3, 'Sorteo', `<div class="big">${icono(state.suministro_requerido)}</div><div class="v">${escapeHTML(state.suministro_requerido||'')} · ${state.es_seguro?'True':'False'}</div>`, state.es_seguro?'ok':'bad') +
+    card(F.m4, 'Final', `<div class="big">${state.es_seguro?'🏆':'💀'}</div><div class="v">${state.es_seguro?'Sobreviviste':'Game over'}</div>`, state.es_seguro?'ok':'bad');
+}
+async function playSim(){
+  if(simTimer) clearTimeout(simTimer);
+  const hasta = etapaActual();
+  pintarEtapas(); pintarResumen();
+  document.getElementById('simNote').textContent = simMode==='mio'
+    ? `Se ejecuta tu programa de esta misión, encadenado con lo que ya programaste antes. Lo que se escribe por teclado se completa con tus elecciones.`
+    : `Así debería verse la ejecución de esta misión. Usa tus datos cuando ya los tienes.`;
+  const term = document.getElementById('simTerm');
+  term.innerHTML = '<span class="dim">Ejecutando…</span>';
+  const L = simMode==='mio' ? await lineasDeMiPrograma(hasta) : lineasEsperadas(hasta);
+  term.innerHTML = '';
+  let i = 0;
+  const paso = ()=>{
+    const c = term.querySelector('.cursor'); if(c) c.remove();
+    if(i>=L.length){ term.insertAdjacentHTML('beforeend','<span class="cursor"></span>'); if(!L.some(l=>l.t==='err')) SFX.ok(); else SFX.fail(); return; }
+    const l = L[i++];
+    let h;
+    if(l.t==='hdr') h = `<span class="hdr">${escapeHTML(l.s)}</span>`;
+    else if(l.t==='in') h = `${escapeHTML(l.s)}<span class="ans">${escapeHTML(l.a)}</span>\n`;
+    else if(l.t==='err') h = `<span class="err">${escapeHTML(l.s)}</span>\n`;
+    else if(l.t==='dim') h = `<span class="dim">${escapeHTML(l.s)}</span>\n`;
+    else h = escapeHTML(l.s) + '\n';
+    term.insertAdjacentHTML('beforeend', h + '<span class="cursor"></span>');
+    term.scrollTop = term.scrollHeight;
+    if(l.t!=='hdr') SFX.tick();
+    simTimer = setTimeout(paso, l.t==='hdr' ? 380 : (l.t==='in' ? 520 : 150));
+  };
+  paso();
 }
 
 /* ════════ RESET ════════ */

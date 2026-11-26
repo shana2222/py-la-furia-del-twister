@@ -20,5 +20,6 @@ La carpeta `assets/` tiene que estar al lado del HTML.
 - Un video corto de "transmisión" por misión (`assets/v_*.mp4`), con texto y sonido.
 - Sonidos generados en el navegador (alarma, viento, acierto, error, victoria, derrota). Se activan o silencian con el botón 🔊.
 - Diagramas que reaccionan al código: índices 1→0, la valija del dron, el sorteo de `random.choice()` y la bifurcación del `if / else`.
-- Botones 📋 para insertar en el editor las listas y los `print` con el texto exacto.
+- Botones 📋 para insertar el texto exacto (entre comillas) de listas, `input()` y `print()`.
+- Simulador de la operación (🖥️): ejecuta el programa del estudiante en la misión actual, encadenado con lo que programó antes, y muestra el resultado esperado. Las tarjetas de resumen acumulan refugio, valija, sorteo y final.
 - Tarjetas de repaso y pistas plegables, reporte de desempeño para CREA (PDF), modo claro/oscuro y progreso guardado.
